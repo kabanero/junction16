@@ -48,7 +48,7 @@ class Game(config: GameConfig) extends ApplicationAdapter {
 			});
 		} else {
 	    client.start()
-	    client.connect(5000, "192.168.0.4", 54555, 54777)
+	    client.connect(5000, config.address, 54555, 54777)
 
 	    val request = SomeRequest("Here is the request");
 	    client.sendTCP(request);
