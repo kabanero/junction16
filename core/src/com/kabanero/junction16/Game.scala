@@ -12,23 +12,47 @@ import java.io.InputStreamReader
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Net.Protocol;
-import com.badlogic.gdx.net.ServerSocket;
-import com.badlogic.gdx.net.ServerSocketHints;
-import com.badlogic.gdx.net.Socket;
-import com.badlogic.gdx.net.SocketHints;
 
-import com.esotericsoftware.kryonet.Server;
+import com.esotericsoftware.kryonet.Server
+import com.esotericsoftware.kryonet.Client
+import com.esotericsoftware.kryonet.Listener
+import com.esotericsoftware.kryonet.Connection
+
+case class SomeRequest(text: String) { }
+
+class SomeResponse(text: String) { }
 
 class Game(config: GameConfig) extends ApplicationAdapter {
 	lazy val batch = new SpriteBatch()
 	lazy val img = new Texture("badlogic.jpg")
+	lazy val server = new Server()
+	lazy val client = new Client()
 
 
 	override def create(): Unit = {
-		val server = new Server()
-	 	server.start()
-	 	server.bind(54555, 54777)
+		if (config.host) {
+			server.start()
+		 	server.bind(54555, 54777)
+
+			server.addListener(new Listener() {
+				override def received(connection: Connection, obj: Object) {
+					obj match {
+						case request: SomeRequest => {
+							println(request.text)
+						}
+						case _ => {
+
+						}
+					}
+				}
+			});
+		} else {
+	    client.start()
+	    client.connect(5000, "192.168.0.4", 54555, 54777)
+
+	    val request = SomeRequest("Here is the request");
+	    client.sendTCP(request);
+		}
 	}
 
 	override def render(): Unit = {
