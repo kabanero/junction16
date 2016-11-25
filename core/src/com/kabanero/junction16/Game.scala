@@ -27,9 +27,12 @@ class Game(config: GameConfig) extends ApplicationAdapter {
 	lazy val img = new Texture("badlogic.jpg")
 	lazy val server = new Server()
 	lazy val client = new Client()
+	lazy val kryo = if (config.host) server.getKryo() else client.getKryo()
 
 
 	override def create(): Unit = {
+		kryo.register(classOf[SomeRequest])
+    kryo.register(classOf[SomeResponse])
 		if (config.host) {
 			server.start()
 		 	server.bind(54555, 54777)
