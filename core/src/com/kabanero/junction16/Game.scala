@@ -20,6 +20,7 @@ import com.badlogic.gdx.graphics.VertexAttributes.Usage
 import com.badlogic.gdx.graphics.g3d.Material
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute
 import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.Input.Keys
 
 
 import java.io.BufferedReader;
@@ -58,6 +59,10 @@ class SomeResponse() {
 	var text: String = ""
 }
 
+case class Inputs(up: Boolean = false, right: Boolean = false, down: Boolean = false, left: Boolean = false);
+
+case class AllInputs(ownInputs: Inputs, otherInputs: Inputs);
+
 class Game(config: GameConfig) extends ApplicationAdapter {
 	lazy val batch = new ModelBatch()
 	lazy val img = new Texture("badlogic.jpg")
@@ -68,13 +73,20 @@ class Game(config: GameConfig) extends ApplicationAdapter {
 	lazy val playerNode = {
 		val node = Node("player")
 
-		// val modelBuilder = new ModelBuilder()
-		// val model = modelBuilder.createBox(
-		// 	5, 5, 5,
-		// 	new Material(ColorAttribute.createDiffuse(Color.GREEN)),
-		// 	Usage.Position | Usage.Normal);
-		// val instance = new ModelInstance(model);
-		// node.modelInstance = Some(instance);
+		node.updateMethods += ((delta: Float, node: Node, inputs: AllInputs) => {
+			if (inputs.ownInputs.up) {
+				node.localPosition.add(0, 0, delta)
+			}
+			if (inputs.ownInputs.down) {
+				node.localPosition.add(0, 0, -delta)
+			}
+			if (inputs.ownInputs.left) {
+				node.localPosition.add(delta, 0, 0)
+			}
+			if (inputs.ownInputs.right) {
+				node.localPosition.add(-delta, 0, 0)
+			}
+		})
 
 		node
 	}
@@ -115,10 +127,19 @@ class Game(config: GameConfig) extends ApplicationAdapter {
 		root
 	}
 
+	def poll: Inputs = {
+    val upState = Gdx.input.isKeyPressed(Keys.W);
+    val downState = Gdx.input.isKeyPressed(Keys.S);
+    val leftState = Gdx.input.isKeyPressed(Keys.A);
+    val rightState = Gdx.input.isKeyPressed(Keys.D);
+
+    Inputs(upState, rightState, downState, leftState);
+  }
 
 	override def create(): Unit = {
 		kryo.register(classOf[SomeRequest])
     kryo.register(classOf[SomeResponse])
+    kryo.register(classOf[Inputs])
 		if (config.host) {
 			server.start()
 		 	server.bind(54555, 54777)
@@ -158,8 +179,9 @@ class Game(config: GameConfig) extends ApplicationAdapter {
 	}
 
 	override def render(): Unit = {
-		playerNode.localPosition.add(0, 0.1f, 0)
-		rootNode.update()
+		val inputs = poll
+		// playerNode.localPosition.add(0, 0.1f, 0)
+		rootNode.update(0.1f, AllInputs(inputs, inputs))
 		Gdx.gl.glClearColor(0, 0, 0, 0)
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT)
 

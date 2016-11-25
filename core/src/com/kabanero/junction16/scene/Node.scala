@@ -6,6 +6,7 @@ import com.badlogic.gdx.math.Matrix4
 import com.badlogic.gdx.graphics.g3d.ModelInstance
 import com.badlogic.gdx.graphics.PerspectiveCamera
 import scala.collection.mutable.ArrayBuffer
+import com.kabanero.junction16.AllInputs
 
 case class Node(
     var name: String,
@@ -15,6 +16,7 @@ case class Node(
 
   var parent: Option[Node] = None
   private var _children = ArrayBuffer[Node]()
+  var updateMethods = ArrayBuffer[(Float, Node, AllInputs) => Unit]()
 
   def children = {
     _children
@@ -61,7 +63,10 @@ case class Node(
     new Vector3(mat(Matrix4.M02), mat(Matrix4.M12), mat(Matrix4.M22))
   }
 
-  def update() {
+  def update(delta: Float, inputs: AllInputs) {
+    updateMethods.foreach { method =>
+      method(delta, this, inputs)
+    }
     modelInstance.foreach(instance => {
       instance.transform = worldTransform()
     })
@@ -72,7 +77,7 @@ case class Node(
       cam.update()
     })
     children.foreach(child => {
-      child.update()
+      child.update(delta, inputs)
     })
   }
 
