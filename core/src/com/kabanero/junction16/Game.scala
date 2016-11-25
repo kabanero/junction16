@@ -64,11 +64,21 @@ case class Inputs(up: Boolean = false, right: Boolean = false, down: Boolean = f
 case class AllInputs(ownInputs: Inputs, otherInputs: Inputs);
 
 class Game(config: GameConfig) extends ApplicationAdapter {
+	val isHost = config.host
+	val isClient = !isHost
+
 	lazy val batch = new ModelBatch()
 	lazy val img = new Texture("badlogic.jpg")
 	lazy val server = new Server()
 	lazy val client = new Client()
 	lazy val kryo = if (config.host) server.getKryo() else client.getKryo()
+
+	var inputsToSend = Inputs()
+	var canSend = false
+
+	var receivedInputs = Inputs()
+	var hasReceivedInputs = false
+	var waitingForInputs = false
 
 	lazy val playerNode = {
 		val node = Node("player")
@@ -147,10 +157,15 @@ class Game(config: GameConfig) extends ApplicationAdapter {
 			server.addListener(new Listener() {
 				override def received(connection: Connection, obj: Object) {
 					obj match {
-						case request: SomeRequest => {
-							println(request.text)
-							val response = SomeResponse("Thanks");
+						case request: Inputs => {
+							println("Reveived inputs")
+							while (!canSend) {
+								Thread.sleep(1)
+							}
+							val response = inputsToSend
+							canSend = false
 	            connection.sendTCP(response);
+							println("Sent inputs")
 						}
 						case _ => {
 
@@ -162,8 +177,10 @@ class Game(config: GameConfig) extends ApplicationAdapter {
 			client.addListener(new Listener() {
 	       override def received(connection: Connection, obj: Object) {
 					 obj match {
-						 case response: SomeResponse => {
-							 println(response.text)
+						 case response: Inputs => {
+							 println("Reveived inputs")
+							 receivedInputs = response
+							 hasReceivedInputs = true
 						 }
 						 case _ => { }
 					 }
@@ -179,9 +196,27 @@ class Game(config: GameConfig) extends ApplicationAdapter {
 	}
 
 	override def render(): Unit = {
+		println("Render")
 		val inputs = poll
-		// playerNode.localPosition.add(0, 0.1f, 0)
-		rootNode.update(0.1f, AllInputs(inputs, inputs))
+
+		if (isHost && hasReceivedInputs) {
+			hasReceivedInputs = false
+			inputsToSend = inputs
+			val otherInputs = receivedInputs
+			canSend = true
+
+			rootNode.update(0.1f, AllInputs(inputs, otherInputs))
+		} else if (isClient && !waitingForInputs) {
+			waitingForInputs = true
+	    client.sendTCP(inputs);
+		} else if (isClient && hasReceivedInputs) {
+			val otherInputs = receivedInputs
+			hasReceivedInputs = false
+			waitingForInputs = false
+
+			rootNode.update(0.1f, AllInputs(inputs, otherInputs))
+		}
+
 		Gdx.gl.glClearColor(0, 0, 0, 0)
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT)
 
