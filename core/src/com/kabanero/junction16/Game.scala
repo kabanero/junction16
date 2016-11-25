@@ -18,34 +18,17 @@ import com.badlogic.gdx.net.ServerSocketHints;
 import com.badlogic.gdx.net.Socket;
 import com.badlogic.gdx.net.SocketHints;
 
+import com.esotericsoftware.kryonet.Server;
+
 class Game(config: GameConfig) extends ApplicationAdapter {
 	lazy val batch = new SpriteBatch()
 	lazy val img = new Texture("badlogic.jpg")
 
 
 	override def create(): Unit = {
-		if (config.host) {
-			val server = Gdx.net.newServerSocket(Protocol.TCP, config.port, null);
-			val client = server.accept(null);
-
-			try {
-				val message = new BufferedReader(new InputStreamReader(client.getInputStream())).readLine();
-				Gdx.app.log("SocketTest", "got client message: " + message);
-				client.getOutputStream().write("I GOT YOUR MESSAGE\n".getBytes());
-			} catch {
-				case e: IOException => Gdx.app.log("PingPongSocketExample", "an error occured", e);
-			}
-		} else {
-			val client = Gdx.net.newClientSocket(Protocol.TCP, config.address, config.port, null);
-
-			try {
-				client.getOutputStream().write("HELLO SERVER\n".getBytes())
-				val response = new BufferedReader(new InputStreamReader(client.getInputStream())).readLine()
-				Gdx.app.log("SocketTest", "got server response: " + response);
-			} catch {
-				case _: Throwable => Gdx.app.log("SocketTest", "error")
-			}
-		}
+		val server = new Server()
+	 	server.start()
+	 	server.bind(54555, 54777)
 	}
 
 	override def render(): Unit = {
