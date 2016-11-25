@@ -55,11 +55,26 @@ object SomeResponse {
 		r
 	}
 }
-class SomeResponse() {
+case class SomeResponse() {
 	var text: String = ""
 }
 
-case class Inputs(up: Boolean = false, right: Boolean = false, down: Boolean = false, left: Boolean = false);
+object Inputs {
+	def apply(up: Boolean, right: Boolean, down: Boolean, left: Boolean) = {
+		var i = new Inputs()
+		i.up = up
+		i.right = right
+		i.down = down
+		i.left = left
+		i
+	}
+}
+case class Inputs() {
+	var up: Boolean = false
+	var right: Boolean = false
+	var down: Boolean = false
+	var left: Boolean = false
+}
 
 case class AllInputs(ownInputs: Inputs, otherInputs: Inputs);
 
@@ -196,7 +211,6 @@ class Game(config: GameConfig) extends ApplicationAdapter {
 	}
 
 	override def render(): Unit = {
-		println("Render")
 		val inputs = poll
 
 		if (isHost && hasReceivedInputs) {
