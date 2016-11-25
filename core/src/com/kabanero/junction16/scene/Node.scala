@@ -1,0 +1,80 @@
+package com.kabanero.junction16.scene
+
+import com.badlogic.gdx.math.Vector3
+import com.badlogic.gdx.math.Quaternion
+import com.badlogic.gdx.math.Matrix4
+import com.badlogic.gdx.graphics.g3d.ModelInstance
+import com.badlogic.gdx.graphics.PerspectiveCamera
+import scala.collection.mutable.ArrayBuffer
+
+case class Node(
+    var name: String,
+    var localPosition: Vector3 = new Vector3(0, 0, 0),
+    var localRotation: Quaternion = new Quaternion(),
+    var localScale: Vector3 = new Vector3(1, 1, 1)) {
+
+  var parent: Option[Node] = None
+  private var _children = ArrayBuffer[Node]()
+
+  def children = {
+    _children
+  }
+
+  def addChild(node: Node) = {
+    children += node
+    node.parent = Some(this)
+  }
+
+  var modelInstance: Option[ModelInstance] = None
+  var cam: Option[PerspectiveCamera] = None
+
+  def localTransform(): Matrix4 = {
+    new Matrix4(localPosition, localRotation, localScale)
+  }
+
+  def worldTransform(): Matrix4 = {
+    if (parent.isDefined) {
+      val mat = parent.get.worldTransform().getValues()
+      parent.get.worldTransform.mul(localTransform)
+    } else {
+      localTransform
+    }
+  }
+
+  def position: Vector3 = {
+    val mat = worldTransform().getValues()
+    new Vector3(mat(Matrix4.M03), mat(Matrix4.M13), mat(Matrix4.M23))
+  }
+
+  def up: Vector3 = {
+    val mat = worldTransform().getValues()
+    new Vector3(mat(Matrix4.M01), mat(Matrix4.M11), mat(Matrix4.M21))
+  }
+
+  def right: Vector3 = {
+    val mat = worldTransform().getValues()
+    new Vector3(mat(Matrix4.M00), mat(Matrix4.M10), mat(Matrix4.M20))
+  }
+
+  def forward: Vector3 = {
+    val mat = worldTransform().getValues()
+    new Vector3(mat(Matrix4.M02), mat(Matrix4.M12), mat(Matrix4.M22))
+  }
+
+  def update() {
+    modelInstance.foreach(instance => {
+      instance.transform = worldTransform()
+    })
+    cam.foreach(cam => {
+      cam.position.set(position)
+      cam.up.set(up)
+      cam.direction.set(forward)
+      cam.update()
+    })
+    children.foreach(child => {
+      child.update()
+    })
+  }
+
+
+}
