@@ -4,9 +4,10 @@ import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
 import com.kabanero.junction16.Game;
 
-public class DesktopLauncher {
-	public static void main (String[] arg) {
-		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
-		new LwjglApplication(new Game(), config);
+object DesktopLauncher {
+	def main (args: Array[String]) {
+		val gameConfig = ArgParser.parse(args);
+		val config = new LwjglApplicationConfiguration();
+		new LwjglApplication(new Game(gameConfig), config);
 	}
 }
