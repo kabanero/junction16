@@ -172,8 +172,10 @@ class Game(config: GameConfig) extends ApplicationAdapter {
 			server.addListener(new Listener() {
 				override def received(connection: Connection, obj: Object) {
 					obj match {
-						case request: Inputs => {
+						case inputs: Inputs => {
 							println("Reveived inputs")
+							hasReceivedInputs = true
+							receivedInputs = inputs
 							while (!canSend) {
 								Thread.sleep(1)
 							}
@@ -219,7 +221,7 @@ class Game(config: GameConfig) extends ApplicationAdapter {
 			val otherInputs = receivedInputs
 			canSend = true
 
-			rootNode.update(0.1f, AllInputs(inputs, otherInputs))
+			rootNode.update(0.1f, AllInputs(otherInputs, inputs))
 		} else if (isClient && !waitingForInputs) {
 			waitingForInputs = true
 	    client.sendTCP(inputs);
@@ -228,7 +230,7 @@ class Game(config: GameConfig) extends ApplicationAdapter {
 			hasReceivedInputs = false
 			waitingForInputs = false
 
-			rootNode.update(0.1f, AllInputs(inputs, otherInputs))
+			rootNode.update(0.1f, AllInputs(otherInputs, inputs))
 		}
 
 		Gdx.gl.glClearColor(0, 0, 0, 0)
