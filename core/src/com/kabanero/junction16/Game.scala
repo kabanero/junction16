@@ -18,9 +18,27 @@ import com.esotericsoftware.kryonet.Client
 import com.esotericsoftware.kryonet.Listener
 import com.esotericsoftware.kryonet.Connection
 
-case class SomeRequest(text: String) { }
+object SomeRequest {
+	def apply(text: String) = {
+		val r = new SomeRequest()
+		r.text = text
+		r
+	}
+}
+case class SomeRequest() {
+	var text: String = ""
+}
 
-class SomeResponse(text: String) { }
+object SomeResponse {
+	def apply(text: String) = {
+		val r = new SomeResponse()
+		r.text = text
+		r
+	}
+}
+class SomeResponse() {
+	var text: String = ""
+}
 
 class Game(config: GameConfig) extends ApplicationAdapter {
 	lazy val batch = new SpriteBatch()
