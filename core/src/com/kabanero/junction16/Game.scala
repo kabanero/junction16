@@ -60,14 +60,27 @@ class Game(config: GameConfig) extends ApplicationAdapter {
 					obj match {
 						case request: SomeRequest => {
 							println(request.text)
+							val response = SomeResponse("Thanks");
+	            connection.sendTCP(response);
 						}
 						case _ => {
 
 						}
 					}
 				}
-			});
+			})
 		} else {
+			client.addListener(new Listener() {
+	       override def received(connection: Connection, obj: Object) {
+					 obj match {
+						 case response: SomeResponse => {
+							 println(response.text)
+						 }
+						 case _ => { }
+					 }
+	       }
+	    })
+
 	    client.start()
 	    client.connect(5000, config.address, 54555, 54777)
 
