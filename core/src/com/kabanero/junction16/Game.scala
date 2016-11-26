@@ -158,8 +158,21 @@ class Game(config: GameConfig) extends ApplicationAdapter with InputProcessor {
 	def touchDragged(x$1: Int,x$2: Int,x$3: Int): Boolean = false
 	def touchUp(x$1: Int,x$2: Int,x$3: Int,x$4: Int): Boolean = false
 	override def mouseMoved(screenX: Int, screenY: Int): Boolean = {
+		var y = screenY
+		if (screenY > 200) {
+			Gdx.input.setCursorPosition(screenX, 200)
+			y = 200
+		} else if (screenY < -200) {
+			Gdx.input.setCursorPosition(screenX, -200)
+			y = -200
+		}
+		if (screenX > 360 * 5) {
+			Gdx.input.setCursorPosition(screenX - 360 * 5, y)
+		} else if (screenX < 360 * 5) {
+			Gdx.input.setCursorPosition(screenX + 360 * 5, y)
+		}
 		mouseX = screenX
-		mouseY = screenY
+		mouseY = y
     return false
   }
 
@@ -183,23 +196,7 @@ class Game(config: GameConfig) extends ApplicationAdapter with InputProcessor {
 				override def received(connection: Connection, obj: Object) {
 					obj match {
 						case inputs: Inputs => {
-							// println("Reveived inputs")
-							// hasReceivedInputs = true
 							receivedInputs = inputs
-							// while (!canSend) {
-							// 	Thread.sleep(2)
-							// }
-							// val response = inputsToSend
-							// canSend = false
-	            // connection.sendTCP(response);
-
-							// val nodes = scene.rootNode.flatten
-							// val buff = ArrayBuffer[TransformChange]()
-							// nodes.foreach { n =>
-							// 	if (n.isDynamic) {
-							// 		buff += TransformChange(n.name, n.localPosition, n.localRotation)
-							// 	}
-							// }
 							connection.sendTCP(newTransforms)
 						}
 						case _ => {
