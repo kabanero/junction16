@@ -36,6 +36,7 @@ case class Node() {
   var physicsBody: Option[Body] = None
   var isDynamic = false
   var isAttacking = false
+  var overrideRotation = false
 
   def flatten: Vector[Node] = {
     Vector(this) ++ _children.map { child =>
@@ -96,7 +97,9 @@ case class Node() {
       val bodyPos = body.getPosition()
       val bodyRot = body.getAngle()
       localPosition = new Vector3(bodyPos.x, 0, bodyPos.y)
-      localRotation.set(new Quaternion(UP, -bodyRot / Math.PI.toFloat * 180.0f))
+      if (!overrideRotation) {
+        localRotation.set(new Quaternion(UP, -bodyRot / Math.PI.toFloat * 180.0f))
+      }
     }
     children.foreach(child => {
       child.update(delta, inputs)

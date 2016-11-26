@@ -254,10 +254,12 @@ class TestScene(iAmGood: Boolean) extends Scene {
   val playerNode = {
 		val node = Node("player")
     node.isDynamic = true
+    node.overrideRotation = true
     node.localPosition.add(14.0f, 0, 5.0f)
 
     val bodyDef = new BodyDef()
     bodyDef.`type` = BodyType.DynamicBody
+    bodyDef.fixedRotation = true
     bodyDef.position.set(
       node.localPosition.x,
       node.localPosition.z)
@@ -302,10 +304,12 @@ class TestScene(iAmGood: Boolean) extends Scene {
   val enemyNode = {
     val node = Node("enemy")
     node.isDynamic = true
+    node.overrideRotation = true
     node.localPosition.add(6.0f, 0.0f, 6.0f)
 
     val bodyDef = new BodyDef()
     bodyDef.`type` = BodyType.DynamicBody
+    bodyDef.fixedRotation = true
     bodyDef.position.set(
       node.localPosition.x,
       node.localPosition.z)
