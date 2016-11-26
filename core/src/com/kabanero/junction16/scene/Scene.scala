@@ -5,10 +5,11 @@ import com.badlogic.gdx.graphics.PerspectiveCamera
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector3
 import com.badlogic.gdx.math.Quaternion
+import com.kabanero.junction16.transform.TransformChange
 
 class Scene {
 
-  val rootNode = Node("root")
+  var rootNode = Node("root")
 
   val cameraNode = {
 		val node = Node("camera")
@@ -30,10 +31,15 @@ class Scene {
     rootNode.updateVisual(delta, inputs)
   }
 
-  // val UP = new Vector3(0, 1, 0)
-
-  // def updateCamera(delta: Float, mouseMovement: MouseMovement) {
-  //   val rotationY = Quaternion(UP, mouseMovement.x)
-  //   cameraNode.localRotation =
-  // }
+  def setPositions(newTransforms: Array[TransformChange]) {
+    val nodes = rootNode.flatten
+    newTransforms.foreach { t =>
+      nodes.foreach { n =>
+        if (n.name == t.name) {
+          n.localPosition = t.position
+          n.localRotation = t.rotation
+        }
+      }
+    }
+  }
 }

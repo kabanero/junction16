@@ -283,7 +283,7 @@ class TestScene(iAmGood: Boolean) extends Scene {
   rootNode.addChild(enemyNode)
   rootNode.addChild(cubeNode)
 
-  override def update(delta: Float, inputs: AllInputs) {
+  override def update(delta: Float, inputs: AllInputs) = {
     super.update(delta, inputs)
 
     world.step(delta, 6, 2)

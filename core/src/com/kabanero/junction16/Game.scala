@@ -44,6 +44,10 @@ import com.esotericsoftware.kryonet.Connection
 
 import com.kabanero.junction16.scene._
 import com.kabanero.junction16.scenes.TestScene
+import com.kabanero.junction16.transform.TransformChange
+import scala.collection.mutable.ArrayBuffer
+import com.badlogic.gdx.math.Vector3
+import com.badlogic.gdx.math.Quaternion
 
 object SomeRequest {
 	def apply(text: String) = {
@@ -52,6 +56,7 @@ object SomeRequest {
 		r
 	}
 }
+
 case class SomeRequest() {
 	var text: String = ""
 }
@@ -63,6 +68,7 @@ object SomeResponse {
 		r
 	}
 }
+
 case class SomeResponse() {
 	var text: String = ""
 }
@@ -86,6 +92,19 @@ case class Inputs() {
 	var left: Boolean = false
 	var mouseX: Int = 0
 	var mouseY: Int = 0
+}
+
+
+object Position {
+	def apply(x: Float, z: Float) = {
+		var p = new Position()
+		p.x = z
+		p.z = z
+	}
+}
+case class Position() {
+	var x: Float = 0.0f
+	var z: Float = 0.0f
 }
 
 case class AllInputs(ownInputs: Inputs, otherInputs: Inputs);
@@ -114,6 +133,8 @@ class Game(config: GameConfig) extends ApplicationAdapter with InputProcessor {
 	var waitingForInputs = false
 
 	lazy val scene = new TestScene(isHost)
+
+	var newTransforms = Array[TransformChange]()
 
 	var mouseX = 0
 	var mouseY = 0
@@ -148,6 +169,10 @@ class Game(config: GameConfig) extends ApplicationAdapter with InputProcessor {
 		kryo.register(classOf[SomeRequest])
     kryo.register(classOf[SomeResponse])
     kryo.register(classOf[Inputs])
+    kryo.register(classOf[TransformChange])
+    kryo.register(classOf[Array[TransformChange]])
+    kryo.register(classOf[Vector3])
+    kryo.register(classOf[Quaternion])
 		if (config.host) {
 			server.start()
 		 	server.bind(54555, 54777)
@@ -165,6 +190,15 @@ class Game(config: GameConfig) extends ApplicationAdapter with InputProcessor {
 							val response = inputsToSend
 							canSend = false
 	            connection.sendTCP(response);
+
+							val nodes = scene.rootNode.flatten
+							val buff = ArrayBuffer[TransformChange]()
+							nodes.foreach { n =>
+								if (n.physicsBody.isDefined) {
+									buff += TransformChange(n.name, n.localPosition, n.localRotation)
+								}
+							}
+							connection.sendTCP(buff.toArray)
 							// println("Sent inputs")
 						}
 						case _ => {
@@ -180,6 +214,10 @@ class Game(config: GameConfig) extends ApplicationAdapter with InputProcessor {
 						 case response: Inputs => {
 							//  println("Reveived inputs")
 							 receivedInputs = response
+							 hasReceivedInputs = true
+						 }
+						 case response: Array[TransformChange] => {
+							 newTransforms = response
 							 hasReceivedInputs = true
 						 }
 						 case _ => { }
@@ -236,7 +274,8 @@ class Game(config: GameConfig) extends ApplicationAdapter with InputProcessor {
 			hasReceivedInputs = false
 			waitingForInputs = false
 
-			scene.update(DELTA, AllInputs(inputs, otherInputs))
+			// scene.update(DELTA, AllInputs(inputs, otherInputs))]
+			scene.setPositions(newTransforms)
 		}
 
 		scene.updateVisual(DELTA, AllInputs(inputs, inputs))

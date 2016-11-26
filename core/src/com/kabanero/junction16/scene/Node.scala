@@ -11,11 +11,21 @@ import com.kabanero.junction16.collision.Collider
 import scala.collection.mutable.ArrayBuffer
 import com.kabanero.junction16.AllInputs
 
-case class Node(
-    var name: String,
-    var localPosition: Vector3 = new Vector3(0, 0, 0),
-    var localRotation: Quaternion = new Quaternion(),
-    var localScale: Vector3 = new Vector3(1, 1, 1)) {
+object Node {
+  def apply(name: String) = {
+    val n = new Node()
+    n.name = name
+    n
+  }
+}
+
+case class Node() {
+
+  var name: String = ""
+
+  var localPosition: Vector3 = new Vector3(0, 0, 0)
+  var localRotation: Quaternion = new Quaternion()
+  var localScale: Vector3 = new Vector3(1, 1, 1)
 
   var parent: Option[Node] = None
   private var _children = ArrayBuffer[Node]()
@@ -24,6 +34,12 @@ case class Node(
   var modelInstance: Option[ModelInstance] = None
   var cam: Option[PerspectiveCamera] = None
   var physicsBody: Option[Body] = None
+
+  def flatten: Vector[Node] = {
+    Vector(this) ++ _children.map { child =>
+      child.flatten
+    }.flatten
+  }
 
   def children = {
     _children
@@ -68,13 +84,9 @@ case class Node(
   }
 
   def update(delta: Float, inputs: AllInputs) {
-
     updateMethods.foreach { method =>
       method(delta, this, inputs)
     }
-    modelInstance.foreach(instance => {
-      instance.transform = worldTransform()
-    })
     children.foreach(child => {
       child.update(delta, inputs)
     })
@@ -84,6 +96,9 @@ case class Node(
     updateVisualMethods.foreach { method =>
       method(delta, this, inputs)
     }
+    modelInstance.foreach(instance => {
+      instance.transform = worldTransform()
+    })
     cam.foreach(cam => {
       val localMat = localTransform
       val mat = localMat.getValues()
