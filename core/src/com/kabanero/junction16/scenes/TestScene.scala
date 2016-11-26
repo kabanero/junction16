@@ -175,11 +175,13 @@ class TestScene(iAmGood: Boolean) extends Scene {
   def enemyAction(delta: Float, node: Node, inputs: AllInputs) {
     if (!iAmGood) {
       val actionState = inputs.ownInputs.action
+      node.isAttacking = actionState
       if (actionState) {
 
       }
     } else {
       val actionState = inputs.otherInputs.action
+      node.isAttacking = actionState
       if (actionState) {
         node.modelInstance = Some(enemyAttackModel);
       } else {
@@ -191,11 +193,13 @@ class TestScene(iAmGood: Boolean) extends Scene {
   def enemyHeadAction(delta: Float, node: Node, inputs: AllInputs) {
     if (!iAmGood) {
       val actionState = inputs.ownInputs.action
+      node.isAttacking = actionState
       if (actionState) {
 
       }
     } else {
       val actionState = inputs.otherInputs.action
+      node.isAttacking = actionState
       if (actionState) {
         node.modelInstance = Some(enemyHeadAttackModel);
       } else {
@@ -334,8 +338,14 @@ class TestScene(iAmGood: Boolean) extends Scene {
 
     if (iAmGood) {
       node.updateMethods += otherMovement
-      val instance = new ModelInstance(models("evil_body"));
-      node.modelInstance = Some(instance);
+
+      node.updateVisualMethods += ((delta: Float, node: Node, inputs: AllInputs) => {
+        if (node.isAttacking) {
+          node.modelInstance = Some(enemyAttackModel)
+        } else {
+          node.modelInstance = Some(enemyModel)
+        }
+      })
     } else {
       node.updateMethods += ownMovement
     }
@@ -384,10 +394,15 @@ class TestScene(iAmGood: Boolean) extends Scene {
     node.isDynamic = true
 
     if (iAmGood) {
-      val instance = new ModelInstance(models("evil_head"));
-      node.modelInstance = Some(instance);
-
       node.updateMethods += otherHeadMovement
+
+      node.updateVisualMethods += ((delta: Float, node: Node, inputs: AllInputs) => {
+        if (node.isAttacking) {
+          node.modelInstance = Some(enemyHeadAttackModel)
+        } else {
+          node.modelInstance = Some(enemyHeadModel)
+        }
+      })
     } else {
       node.updateMethods += ownHeadMovement
     }

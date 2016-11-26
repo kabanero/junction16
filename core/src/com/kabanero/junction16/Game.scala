@@ -136,7 +136,7 @@ class Game(config: GameConfig) extends ApplicationAdapter with InputProcessor {
 	var hasReceivedInputs = false
 	var waitingForInputs = false
 
-	lazy val scene = new TestScene(isHost)
+	lazy val scene = new TestScene(!isHost)
 
 	var newTransforms = Array[TransformChange]()
 
