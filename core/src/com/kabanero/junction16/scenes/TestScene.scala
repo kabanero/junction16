@@ -62,22 +62,22 @@ class TestScene(iAmGood: Boolean) extends Scene {
   collisionSizes("ent_chair") = (0.5f,0.5f)
 
   models("ent_coffee_table") = modelLoader.loadModel(Gdx.files.internal("ent_coffee_table.g3dj"))
-  collisionSizes("ent_coffee_table") = (2f,0.5f)
+  collisionSizes("ent_coffee_table") = (1f,0.25f)
 
   models("ent_desk") = modelLoader.loadModel(Gdx.files.internal("ent_desk.g3dj"))
   collisionSizes("ent_desk") = (0.5f,1f)
 
   models("ent_device_ctrl_panel") = modelLoader.loadModel(Gdx.files.internal("ent_device_ctrl_panel.g3dj"))
-  collisionSizes("ent_device_ctrl_panel") = (1f,1f)
+  collisionSizes("ent_device_ctrl_panel") = (0.4f,0.4f)
 
   models("ent_device_iv") = modelLoader.loadModel(Gdx.files.internal("ent_device_iv.g3dj"))
-  collisionSizes("ent_device_iv") = (0.5f,0.5f)
+  collisionSizes("ent_device_iv") = (0.2f,0.2f)
 
   models("ent_device_screens") = modelLoader.loadModel(Gdx.files.internal("ent_device_screens.g3dj"))
-  collisionSizes("ent_device_screens") = (1.1f,1.1f)
+  collisionSizes("ent_device_screens") = (0.5f,0.5f)
 
   models("ent_sofa") = modelLoader.loadModel(Gdx.files.internal("ent_sofa.g3dj"))
-  collisionSizes("ent_sofa") = (1.15f,0.65f)
+  collisionSizes("ent_sofa") = (1.0f,0.5f)
 
   models("ent_stand") = modelLoader.loadModel(Gdx.files.internal("ent_stand.g3dj"))
   collisionSizes("ent_stand") = (0.25f,0.25f)
@@ -98,10 +98,10 @@ class TestScene(iAmGood: Boolean) extends Scene {
   models("evil_head_attack") = modelLoader.loadModel(Gdx.files.internal("evil_head_attack.g3dj"))
 
   models("npc_doctor") = modelLoader.loadModel(Gdx.files.internal("npc_doctor.g3dj"))
-  collisionSizes("npc_doctor") = (0.5f,0.5f)
+  collisionSizes("npc_doctor") = (0.25f,0.25f)
 
   models("npc_doctor_dead") = modelLoader.loadModel(Gdx.files.internal("npc_doctor_dead.g3dj"))
-  collisionSizes("npc_doctor_dead") = (0.5f,0.5f)
+  collisionSizes("npc_doctor_dead") = (0.1f,0.1f)
 
   def ownMovement(delta: Float, node: Node, inputs: AllInputs) {
     val rotationY = new Quaternion(UP, -inputs.ownInputs.mouseX * CAMERA_SPEED)
