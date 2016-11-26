@@ -48,6 +48,7 @@ import com.kabanero.junction16.transform.TransformChange
 import scala.collection.mutable.ArrayBuffer
 import com.badlogic.gdx.math.Vector3
 import com.badlogic.gdx.math.Quaternion
+import com.badlogic.gdx.physics.box2d.BodyDef.BodyType
 
 object SomeRequest {
 	def apply(text: String) = {
@@ -194,12 +195,11 @@ class Game(config: GameConfig) extends ApplicationAdapter with InputProcessor {
 							val nodes = scene.rootNode.flatten
 							val buff = ArrayBuffer[TransformChange]()
 							nodes.foreach { n =>
-								if (n.physicsBody.isDefined) {
+								if (n.isDynamic) {
 									buff += TransformChange(n.name, n.localPosition, n.localRotation)
 								}
 							}
 							connection.sendTCP(buff.toArray)
-							// println("Sent inputs")
 						}
 						case _ => {
 
@@ -212,7 +212,6 @@ class Game(config: GameConfig) extends ApplicationAdapter with InputProcessor {
 	       override def received(connection: Connection, obj: Object) {
 					 obj match {
 						 case response: Inputs => {
-							//  println("Reveived inputs")
 							 receivedInputs = response
 							 hasReceivedInputs = true
 						 }

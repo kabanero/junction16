@@ -139,8 +139,14 @@ class TestScene(iAmGood: Boolean) extends Scene {
     node.localRotation.set(rotationX)
   }
 
+  def ownHeadMovement(delta: Float, node: Node, inputs: AllInputs) {
+    val rotationX = new Quaternion(RIGHT, -inputs.ownInputs.mouseY * CAMERA_SPEED)
+    node.localRotation.set(rotationX)
+  }
+
   val playerNode = {
 		val node = Node("player")
+    node.isDynamic = true
     node.localPosition.add(-5.0f, 0.6f, 0)
 
     val bodyDef = new BodyDef()
@@ -183,6 +189,7 @@ class TestScene(iAmGood: Boolean) extends Scene {
   }
   val enemyNode = {
     val node = Node("enemy")
+    node.isDynamic = true
     node.localPosition.add(5.0f, 0.6f, 0)
 
     val bodyDef = new BodyDef()
@@ -233,7 +240,9 @@ class TestScene(iAmGood: Boolean) extends Scene {
   })
 
   val playerHead = {
-    val node = Node("head")
+    val node = Node("player head")
+    node.isDynamic = true
+
     node.localPosition.add(0, 1.15f, 0)
     if (!iAmGood) {
       val modelBuilder = new ModelBuilder()
@@ -245,14 +254,18 @@ class TestScene(iAmGood: Boolean) extends Scene {
       node.modelInstance = Some(instance);
 
       node.updateMethods += otherHeadMovement
+    } else {
+      node.updateMethods += ownHeadMovement
     }
 
     node
   }
 
   val enemyHead = {
-    val node = Node("head")
+    val node = Node("enemy head")
     node.localPosition.add(0, 1.15f, 0)
+
+    node.isDynamic = true
 
     if (iAmGood) {
       val modelBuilder = new ModelBuilder()
@@ -264,6 +277,8 @@ class TestScene(iAmGood: Boolean) extends Scene {
       node.modelInstance = Some(instance);
 
       node.updateMethods += otherHeadMovement
+    } else {
+      node.updateMethods += ownHeadMovement
     }
 
     node
@@ -278,7 +293,7 @@ class TestScene(iAmGood: Boolean) extends Scene {
   enemyNode.addChild(enemyHead)
 
 	val cubeNode = {
-		val node = Node("cube")
+		val node = Node("screen thingy")
 
 		val instance = new ModelInstance(models("ent_device_screens"));
 		node.modelInstance = Some(instance);

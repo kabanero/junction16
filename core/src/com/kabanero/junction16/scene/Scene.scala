@@ -15,7 +15,7 @@ class Scene {
 		val node = Node("camera")
 
 		val cam  = new PerspectiveCamera(67, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-		cam.near = 1f
+		cam.near = 0.2f
 		cam.far = 300f
 		cam.update()
 		node.cam = Some(cam)
