@@ -13,7 +13,7 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute
 import com.badlogic.gdx.graphics.g3d.Material
 
-class TestScene extends Scene {
+class TestScene(iAmGood: Boolean) extends Scene {
   val PLAYER_SPEED = 5.0f
   val CAMERA_SPEED = 1 / 5.0f
   val UP = new Vector3(0, 1, 0)
@@ -21,7 +21,11 @@ class TestScene extends Scene {
 
   val playerNode = {
 		val node = Node("player")
-    node.localPosition.add(-5.0f, 0, 0)
+    if (iAmGood) {
+      node.localPosition.add(-5.0f, 0, 0)
+    } else {
+      node.localPosition.add(5.0f, 0, 0)
+    }
 
 		node.updateMethods += ((delta: Float, node: Node, inputs: AllInputs) => {
       val rotationY = new Quaternion(UP, -inputs.ownInputs.mouseX * CAMERA_SPEED)
@@ -58,7 +62,11 @@ class TestScene extends Scene {
 
   val enemyNode = {
     val node = Node("enemy")
-    node.localPosition.add(5.0f, 0, 0)
+    if (iAmGood) {
+      node.localPosition.add(5.0f, 0, 0)
+    } else {
+      node.localPosition.add(-5.0f, 0, 0)
+    }
 
     val modelBuilder = new ModelBuilder()
     val model = modelBuilder.createBox(
@@ -69,8 +77,8 @@ class TestScene extends Scene {
     node.modelInstance = Some(instance);
 
     node.updateMethods += ((delta: Float, node: Node, inputs: AllInputs) => {
-      val rotationY = new Quaternion(UP, -inputs.ownInputs.mouseX * CAMERA_SPEED)
-      val rotationX = new Quaternion(RIGHT, -inputs.ownInputs.mouseY * CAMERA_SPEED)
+      val rotationY = new Quaternion(UP, -inputs.otherInputs.mouseX * CAMERA_SPEED)
+      val rotationX = new Quaternion(RIGHT, -inputs.otherInputs.mouseY * CAMERA_SPEED)
       node.localRotation.set(rotationY.mul(rotationX))
 
       val moveDirection = new Vector3(0, 0, 0)
