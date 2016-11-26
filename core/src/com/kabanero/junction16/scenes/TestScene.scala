@@ -187,7 +187,7 @@ class TestScene(iAmGood: Boolean) extends Scene {
   val playerNode = {
 		val node = Node("player")
     node.isDynamic = true
-    node.localPosition.add(-5.0f, 0.0f, 0)
+    node.localPosition.add(5.0f, 0, 10.0f)
 
     val bodyDef = new BodyDef()
     bodyDef.`type` = BodyType.DynamicBody
@@ -225,7 +225,7 @@ class TestScene(iAmGood: Boolean) extends Scene {
   val enemyNode = {
     val node = Node("enemy")
     node.isDynamic = true
-    node.localPosition.add(5.0f, 0.0f, 0)
+    node.localPosition.add(6.0f, 0.0f, 6.0f)
 
     val bodyDef = new BodyDef()
     bodyDef.`type` = BodyType.DynamicBody

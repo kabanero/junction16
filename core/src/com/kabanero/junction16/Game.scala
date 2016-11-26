@@ -249,9 +249,9 @@ class Game(config: GameConfig) extends ApplicationAdapter with InputProcessor {
 		batch.end()
 
 		val inputs = poll
-
 		if (isClient) {
 			client.sendTCP(inputs)
+
 			scene.setPositions(newTransforms)
 			scene.updateVisual(DELTA, AllInputs(inputs, inputs))
 		}
