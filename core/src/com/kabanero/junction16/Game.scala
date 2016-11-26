@@ -36,6 +36,7 @@ import com.esotericsoftware.kryonet.Listener
 import com.esotericsoftware.kryonet.Connection
 
 import com.kabanero.junction16.scene._
+import com.kabanero.junction16.scenes.TestScene
 
 object SomeRequest {
 	def apply(text: String) = {
@@ -95,62 +96,7 @@ class Game(config: GameConfig) extends ApplicationAdapter {
 	var hasReceivedInputs = false
 	var waitingForInputs = false
 
-	lazy val playerNode = {
-		val node = Node("player")
-
-		node.updateMethods += ((delta: Float, node: Node, inputs: AllInputs) => {
-			if (inputs.ownInputs.up) {
-				node.localPosition.add(0, 0, delta)
-			}
-			if (inputs.ownInputs.down) {
-				node.localPosition.add(0, 0, -delta)
-			}
-			if (inputs.ownInputs.left) {
-				node.localPosition.add(delta, 0, 0)
-			}
-			if (inputs.ownInputs.right) {
-				node.localPosition.add(-delta, 0, 0)
-			}
-		})
-
-		node
-	}
-	lazy val cameraNode = {
-		val node = Node("camera")
-
-		val cam  = new PerspectiveCamera(67, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-		// cam.position.set(10f, 10f, 10f)
-		// cam.lookAt(0, 0, 0)
-		cam.near = 1f
-		cam.far = 300f
-		cam.update()
-		node.cam = Some(cam)
-
-		playerNode.addChild(node)
-
-		node
-	}
-	lazy val cubeNode = {
-		val node = Node("cube")
-
-		val modelBuilder = new ModelBuilder()
-		val model = modelBuilder.createBox(
-			5, 5, 5,
-			new Material(ColorAttribute.createDiffuse(Color.GREEN)),
-			Usage.Position | Usage.Normal);
-		val instance = new ModelInstance(model);
-		node.modelInstance = Some(instance);
-
-		node.localPosition = new Vector3(0, 0, 8)
-
-		node
-	}
-	lazy val rootNode = {
-		val root = Node("root")
-		root.addChild(playerNode)
-		root.addChild(cubeNode)
-		root
-	}
+	lazy val scene = new TestScene()
 
 	def poll: Inputs = {
     val upState = Gdx.input.isKeyPressed(Keys.W);
@@ -212,8 +158,12 @@ class Game(config: GameConfig) extends ApplicationAdapter {
 		}
 	}
 
+	val DELTA = 1/60.0f
+
 	override def render(): Unit = {
 		val inputs = poll
+
+		// scene.update(DELTA, AllInputs(inputs, inputs))
 
 		if (isHost && hasReceivedInputs) {
 			hasReceivedInputs = false
@@ -221,7 +171,7 @@ class Game(config: GameConfig) extends ApplicationAdapter {
 			val otherInputs = receivedInputs
 			canSend = true
 
-			rootNode.update(0.1f, AllInputs(otherInputs, inputs))
+			scene.update(DELTA, AllInputs(otherInputs, inputs))
 		} else if (isClient && !waitingForInputs) {
 			waitingForInputs = true
 	    client.sendTCP(inputs);
@@ -230,14 +180,14 @@ class Game(config: GameConfig) extends ApplicationAdapter {
 			hasReceivedInputs = false
 			waitingForInputs = false
 
-			rootNode.update(0.1f, AllInputs(otherInputs, inputs))
+			scene.update(DELTA, AllInputs(otherInputs, inputs))
 		}
 
 		Gdx.gl.glClearColor(0, 0, 0, 0)
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT)
 
-		batch.begin(cameraNode.cam.get)
-		render(rootNode, batch)
+		batch.begin(scene.cameraNode.cam.get)
+		render(scene.rootNode, batch)
 		batch.end()
 	}
 
