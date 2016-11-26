@@ -154,7 +154,7 @@ class Game(config: GameConfig) extends ApplicationAdapter with InputProcessor {
 				override def received(connection: Connection, obj: Object) {
 					obj match {
 						case inputs: Inputs => {
-							println("Reveived inputs")
+							// println("Reveived inputs")
 							hasReceivedInputs = true
 							receivedInputs = inputs
 							while (!canSend) {
@@ -163,7 +163,7 @@ class Game(config: GameConfig) extends ApplicationAdapter with InputProcessor {
 							val response = inputsToSend
 							canSend = false
 	            connection.sendTCP(response);
-							println("Sent inputs")
+							// println("Sent inputs")
 						}
 						case _ => {
 
@@ -176,7 +176,7 @@ class Game(config: GameConfig) extends ApplicationAdapter with InputProcessor {
 	       override def received(connection: Connection, obj: Object) {
 					 obj match {
 						 case response: Inputs => {
-							 println("Reveived inputs")
+							//  println("Reveived inputs")
 							 receivedInputs = response
 							 hasReceivedInputs = true
 						 }
