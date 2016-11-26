@@ -85,9 +85,18 @@ case class Node() {
     new Vector3(mat(Matrix4.M02), mat(Matrix4.M12), mat(Matrix4.M22))
   }
 
+  val UP: Vector3 = new Vector3(0, 1, 0)
+
   def update(delta: Float, inputs: AllInputs) {
     updateMethods.foreach { method =>
       method(delta, this, inputs)
+    }
+    if (physicsBody.isDefined) {
+      val body = physicsBody.get
+      val bodyPos = body.getPosition()
+      val bodyRot = body.getAngle()
+      localPosition = new Vector3(bodyPos.x, 0, bodyPos.y)
+      localRotation.set(new Quaternion(UP, -bodyRot / Math.PI.toFloat * 180.0f))
     }
     children.foreach(child => {
       child.update(delta, inputs)

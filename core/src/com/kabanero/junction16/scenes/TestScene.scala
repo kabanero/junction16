@@ -131,9 +131,9 @@ class TestScene(iAmGood: Boolean) extends Scene {
     body.setLinearVelocity(velo.x, velo.z)
 
 
-    val bodyPos = node.physicsBody.get.getPosition()
-
-    node.localPosition = new Vector3(bodyPos.x, 0, bodyPos.y)
+    // val bodyPos = node.physicsBody.get.getPosition()
+    //
+    // node.localPosition = new Vector3(bodyPos.x, 0, bodyPos.y)
   }
 
   val playerModel = new ModelInstance(models("doc_body"));

@@ -62,15 +62,27 @@ abstract class SubLevel(
     val collisionSize = collisionSizes(id)
 
     val groundBodyDef = new BodyDef();
+    groundBodyDef.`type` = BodyType.DynamicBody
     groundBodyDef.position.set(new Vector2(node.localPosition.x, node.localPosition.z));
     groundBodyDef.angle = rotation/180.0f * Math.PI.toFloat;
     val groundBody = world.createBody(groundBodyDef)
+
     val groundBox = new PolygonShape()
     groundBox.setAsBox(collisionSize._1, collisionSize._2)
-    groundBody.createFixture(groundBox, 0.0f)
+
+    val fixtureDef = new FixtureDef()
+    fixtureDef.shape = groundBox
+    fixtureDef.density = 0.5f
+    fixtureDef.friction = 0.4f
+    fixtureDef.restitution = 0.0f
+
+    val fixture = groundBody.createFixture(fixtureDef)
+
     groundBox.dispose()
 
     node.physicsBody = Some(groundBody)
+
+    node.isDynamic = true
 
     node
 
