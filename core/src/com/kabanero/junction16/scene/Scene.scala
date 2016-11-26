@@ -38,6 +38,7 @@ class Scene {
         if (n.name == t.name) {
           n.localPosition = t.position
           n.localRotation = t.rotation
+          n.isAttacking = t.isAttacking
         }
       }
     }

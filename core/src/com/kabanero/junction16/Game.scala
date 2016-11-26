@@ -24,6 +24,7 @@ import com.badlogic.gdx.graphics.g3d.Environment
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.Input.Keys
+import com.badlogic.gdx.Input.Buttons
 import com.badlogic.gdx.graphics.g3d.loader.G3dModelLoader
 import com.badlogic.gdx.utils.UBJsonReader
 import com.badlogic.gdx.Files.FileType
@@ -75,7 +76,7 @@ case class SomeResponse() {
 }
 
 object Inputs {
-	def apply(up: Boolean, right: Boolean, down: Boolean, left: Boolean, mouseX: Int, mouseY: Int) = {
+	def apply(up: Boolean, right: Boolean, down: Boolean, left: Boolean, action: Boolean, mouseX: Int, mouseY: Int) = {
 		var i = new Inputs()
 		i.up = up
 		i.right = right
@@ -83,6 +84,7 @@ object Inputs {
 		i.left = left
 		i.mouseX = mouseX
 		i.mouseY = mouseY
+		i.action = action
 		i
 	}
 }
@@ -146,8 +148,9 @@ class Game(config: GameConfig) extends ApplicationAdapter with InputProcessor {
     val downState = Gdx.input.isKeyPressed(Keys.S)
     val leftState = Gdx.input.isKeyPressed(Keys.A)
     val rightState = Gdx.input.isKeyPressed(Keys.D)
+    val action = Gdx.input.isButtonPressed(Buttons.LEFT) || Gdx.input.isKeyPressed(Keys.SPACE)
 
-    Inputs(upState, rightState, downState, leftState, mouseX, mouseY);
+    Inputs(upState, rightState, downState, leftState, action, mouseX, mouseY);
   }
 
 	def keyDown(x$1: Int): Boolean = false
@@ -259,7 +262,7 @@ class Game(config: GameConfig) extends ApplicationAdapter with InputProcessor {
 			val buff = ArrayBuffer[TransformChange]()
 			nodes.foreach { n =>
 				if (n.isDynamic) {
-					buff += TransformChange(n.name, n.localPosition, n.localRotation)
+					buff += TransformChange(n.name, n.localPosition, n.localRotation, n.isAttacking)
 				}
 			}
 			newTransforms = buff.toArray

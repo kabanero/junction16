@@ -35,6 +35,7 @@ case class Node() {
   var cam: Option[PerspectiveCamera] = None
   var physicsBody: Option[Body] = None
   var isDynamic = false
+  var isAttacking = false
 
   def flatten: Vector[Node] = {
     Vector(this) ++ _children.map { child =>

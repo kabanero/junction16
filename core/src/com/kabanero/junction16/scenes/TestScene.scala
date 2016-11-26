@@ -37,86 +37,11 @@ class TestScene(iAmGood: Boolean) extends Scene {
   val world = new World(new Vector2(0, 0), true)
 
   val models = Map[String, Model]()
-  val collisionSizes = Map[String, Tuple2[Float, Float]]()
-
-  def ownMovement(delta: Float, node: Node, inputs: AllInputs) {
-    val rotationY = new Quaternion(UP, -inputs.ownInputs.mouseX * CAMERA_SPEED)
-    val rotationX = new Quaternion(RIGHT, -inputs.ownInputs.mouseY * CAMERA_SPEED)
-
-    val body = node.physicsBody.get
-
-    node.localRotation.set(rotationY)
-
-    val moveDirection = new Vector3(0, 0, 0)
-
-    val forwardMove = node.forward
-    forwardMove.y = 0
-    forwardMove.nor()
-    val rightMove = node.right
-    rightMove.y = 0
-    rightMove.nor()
-    if (inputs.ownInputs.up) {
-      moveDirection.z += 1
-    }
-    if (inputs.ownInputs.down) {
-      moveDirection.z -= 1
-    }
-    if (inputs.ownInputs.left) {
-      moveDirection.x += 1
-    }
-    if (inputs.ownInputs.right) {
-      moveDirection.x -= 1
-    }
-
-    val velo = forwardMove.scl(moveDirection.z * delta * PLAYER_SPEED).add(rightMove.scl(moveDirection.x * delta * PLAYER_SPEED))
-
-    body.setLinearVelocity(velo.x, velo.z)
-
-
-    val bodyPos = node.physicsBody.get.getPosition()
-
-    node.localPosition = new Vector3(bodyPos.x, 0, bodyPos.y)
-  }
-
-  def otherMovement(delta: Float, node: Node, inputs: AllInputs) {
-    val rotationY = new Quaternion(UP, -inputs.otherInputs.mouseX * CAMERA_SPEED)
-    val rotationX = new Quaternion(RIGHT, -inputs.otherInputs.mouseY * CAMERA_SPEED)
-    node.localRotation.set(rotationY)
-
-    val moveDirection = new Vector3(0, 0, 0)
-
-    val body = node.physicsBody.get
-
-    val forwardMove = node.forward
-    forwardMove.y = 0
-    forwardMove.nor()
-    val rightMove = node.right
-    rightMove.y = 0
-    rightMove.nor()
-    if (inputs.otherInputs.up) {
-      moveDirection.z += 1
-    }
-    if (inputs.otherInputs.down) {
-      moveDirection.z -= 1
-    }
-    if (inputs.otherInputs.left) {
-      moveDirection.x += 1
-    }
-    if (inputs.otherInputs.right) {
-      moveDirection.x -= 1
-    }
-
-    val velo = forwardMove.scl(moveDirection.z * delta * PLAYER_SPEED).add(rightMove.scl(moveDirection.x * delta * PLAYER_SPEED))
-
-    body.setLinearVelocity(velo.x, velo.z)
-
-    val bodyPos = node.physicsBody.get.getPosition()
-
-    node.localPosition = new Vector3(bodyPos.x, 0, bodyPos.y)
-  }
 
   val jsonReader = new JsonReader()
   val modelLoader = new G3dModelLoader(jsonReader);
+
+  val collisionSizes = Map[String, Tuple2[Float, Float]]()
 
   models("doc_head") = modelLoader.loadModel(Gdx.files.internal("doc_head.g3dj"))
   models("doc_body") = modelLoader.loadModel(Gdx.files.internal("doc_body.g3dj"))
@@ -172,6 +97,143 @@ class TestScene(iAmGood: Boolean) extends Scene {
   models("npc_doctor_dead") = modelLoader.loadModel(Gdx.files.internal("npc_doctor_dead.g3dj"))
   collisionSizes("npc_doctor_dead") = (0.5f,0.5f)
 
+  def ownMovement(delta: Float, node: Node, inputs: AllInputs) {
+    val rotationY = new Quaternion(UP, -inputs.ownInputs.mouseX * CAMERA_SPEED)
+    val rotationX = new Quaternion(RIGHT, -inputs.ownInputs.mouseY * CAMERA_SPEED)
+
+    val body = node.physicsBody.get
+
+    node.localRotation.set(rotationY)
+
+    val moveDirection = new Vector3(0, 0, 0)
+
+    val forwardMove = node.forward
+    forwardMove.y = 0
+    forwardMove.nor()
+    val rightMove = node.right
+    rightMove.y = 0
+    rightMove.nor()
+    if (inputs.ownInputs.up) {
+      moveDirection.z += 1
+    }
+    if (inputs.ownInputs.down) {
+      moveDirection.z -= 1
+    }
+    if (inputs.ownInputs.left) {
+      moveDirection.x += 1
+    }
+    if (inputs.ownInputs.right) {
+      moveDirection.x -= 1
+    }
+
+    val velo = forwardMove.scl(moveDirection.z * delta * PLAYER_SPEED).add(rightMove.scl(moveDirection.x * delta * PLAYER_SPEED))
+
+    body.setLinearVelocity(velo.x, velo.z)
+
+
+    val bodyPos = node.physicsBody.get.getPosition()
+
+    node.localPosition = new Vector3(bodyPos.x, 0, bodyPos.y)
+  }
+
+  val playerModel = new ModelInstance(models("doc_body"));
+  val playerHeadModel = new ModelInstance(models("doc_head"));
+  val playerAttackModel = new ModelInstance(models("doc_body_attack"));
+  val playerHeadAttackModel = new ModelInstance(models("doc_head_attack"));
+
+  val enemyModel = new ModelInstance(models("evil_body"));
+  val enemyHeadModel = new ModelInstance(models("evil_head"));
+  val enemyAttackModel = new ModelInstance(models("evil_body_attack"));
+  val enemyHeadAttackModel = new ModelInstance(models("evil_head_attack"));
+
+  def playerAction(delta: Float, node: Node, inputs: AllInputs) {
+    if (iAmGood) {
+      val actionState = inputs.ownInputs.action
+      node.isAttacking = actionState
+    } else {
+      val actionState = inputs.otherInputs.action
+      node.isAttacking = actionState
+    }
+  }
+
+  def playerHeadAction(delta: Float, node: Node, inputs: AllInputs) {
+    if (iAmGood) {
+      val actionState = inputs.ownInputs.action
+      node.isAttacking = actionState
+    } else {
+      val actionState = inputs.otherInputs.action
+      node.isAttacking = actionState
+    }
+  }
+
+  def enemyAction(delta: Float, node: Node, inputs: AllInputs) {
+    if (!iAmGood) {
+      val actionState = inputs.ownInputs.action
+      if (actionState) {
+
+      }
+    } else {
+      val actionState = inputs.otherInputs.action
+      if (actionState) {
+        node.modelInstance = Some(enemyAttackModel);
+      } else {
+        node.modelInstance = Some(enemyModel);
+      }
+    }
+  }
+
+  def enemyHeadAction(delta: Float, node: Node, inputs: AllInputs) {
+    if (!iAmGood) {
+      val actionState = inputs.ownInputs.action
+      if (actionState) {
+
+      }
+    } else {
+      val actionState = inputs.otherInputs.action
+      if (actionState) {
+        node.modelInstance = Some(enemyHeadAttackModel);
+      } else {
+        node.modelInstance = Some(enemyHeadModel);
+      }
+    }
+  }
+
+  def otherMovement(delta: Float, node: Node, inputs: AllInputs) {
+    val rotationY = new Quaternion(UP, -inputs.otherInputs.mouseX * CAMERA_SPEED)
+    val rotationX = new Quaternion(RIGHT, -inputs.otherInputs.mouseY * CAMERA_SPEED)
+    node.localRotation.set(rotationY)
+
+    val moveDirection = new Vector3(0, 0, 0)
+
+    val body = node.physicsBody.get
+
+    val forwardMove = node.forward
+    forwardMove.y = 0
+    forwardMove.nor()
+    val rightMove = node.right
+    rightMove.y = 0
+    rightMove.nor()
+    if (inputs.otherInputs.up) {
+      moveDirection.z += 1
+    }
+    if (inputs.otherInputs.down) {
+      moveDirection.z -= 1
+    }
+    if (inputs.otherInputs.left) {
+      moveDirection.x += 1
+    }
+    if (inputs.otherInputs.right) {
+      moveDirection.x -= 1
+    }
+
+    val velo = forwardMove.scl(moveDirection.z * delta * PLAYER_SPEED).add(rightMove.scl(moveDirection.x * delta * PLAYER_SPEED))
+
+    body.setLinearVelocity(velo.x, velo.z)
+
+    val bodyPos = node.physicsBody.get.getPosition()
+
+    node.localPosition = new Vector3(bodyPos.x, 0, bodyPos.y)
+  }
 
 
   def otherHeadMovement(delta: Float, node: Node, inputs: AllInputs) {
@@ -216,9 +278,19 @@ class TestScene(iAmGood: Boolean) extends Scene {
       node.updateMethods += ownMovement
     } else {
       node.updateMethods += otherMovement
-      val instance = new ModelInstance(models("doc_body"));
-      node.modelInstance = Some(instance);
+      val instance = new ModelInstance(models("doc_body"))
+      node.modelInstance = Some(instance)
+
+      node.updateVisualMethods += ((delta: Float, node: Node, inputs: AllInputs) => {
+        if (node.isAttacking) {
+          node.modelInstance = Some(playerAttackModel)
+        } else {
+          node.modelInstance = Some(playerModel)
+        }
+      })
     }
+
+    node.updateMethods += playerAction
 
     node
   }
@@ -258,10 +330,12 @@ class TestScene(iAmGood: Boolean) extends Scene {
       node.updateMethods += ownMovement
     }
 
+    node.updateMethods += enemyAction
+
 		node
   }
 
-  cameraNode.updateVisualMethods +=((delta: Float, node: Node, inputs: AllInputs) => {
+  cameraNode.updateVisualMethods += ( (delta: Float, node: Node, inputs: AllInputs) => {
     val rotationY = new Quaternion(UP, -inputs.ownInputs.mouseX * CAMERA_SPEED)
     val rotationX = new Quaternion(RIGHT, -inputs.ownInputs.mouseY * CAMERA_SPEED)
     node.localRotation.set(rotationY.mul(rotationX))
@@ -275,13 +349,20 @@ class TestScene(iAmGood: Boolean) extends Scene {
 
     node.localPosition.add(0, 1.25f, 0)
     if (!iAmGood) {
-      val instance = new ModelInstance(models("doc_head"));
-      node.modelInstance = Some(instance);
-
       node.updateMethods += otherHeadMovement
+
+      node.updateVisualMethods += ((delta: Float, node: Node, inputs: AllInputs) => {
+        if (node.isAttacking) {
+          node.modelInstance = Some(playerHeadAttackModel)
+        } else {
+          node.modelInstance = Some(playerHeadModel)
+        }
+      })
     } else {
       node.updateMethods += ownHeadMovement
     }
+
+    node.updateMethods += playerHeadAction
 
     node
   }
@@ -300,6 +381,8 @@ class TestScene(iAmGood: Boolean) extends Scene {
     } else {
       node.updateMethods += ownHeadMovement
     }
+
+    node.updateMethods += enemyHeadAction
 
     node
   }
