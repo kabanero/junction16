@@ -91,6 +91,7 @@ case class Inputs() {
 	var right: Boolean = false
 	var down: Boolean = false
 	var left: Boolean = false
+	var action: Boolean = false
 	var mouseX: Int = 0
 	var mouseY: Int = 0
 }
@@ -183,23 +184,23 @@ class Game(config: GameConfig) extends ApplicationAdapter with InputProcessor {
 					obj match {
 						case inputs: Inputs => {
 							// println("Reveived inputs")
-							hasReceivedInputs = true
+							// hasReceivedInputs = true
 							receivedInputs = inputs
-							while (!canSend) {
-								Thread.sleep(2)
-							}
-							val response = inputsToSend
-							canSend = false
-	            connection.sendTCP(response);
+							// while (!canSend) {
+							// 	Thread.sleep(2)
+							// }
+							// val response = inputsToSend
+							// canSend = false
+	            // connection.sendTCP(response);
 
-							val nodes = scene.rootNode.flatten
-							val buff = ArrayBuffer[TransformChange]()
-							nodes.foreach { n =>
-								if (n.isDynamic) {
-									buff += TransformChange(n.name, n.localPosition, n.localRotation)
-								}
-							}
-							connection.sendTCP(buff.toArray)
+							// val nodes = scene.rootNode.flatten
+							// val buff = ArrayBuffer[TransformChange]()
+							// nodes.foreach { n =>
+							// 	if (n.isDynamic) {
+							// 		buff += TransformChange(n.name, n.localPosition, n.localRotation)
+							// 	}
+							// }
+							connection.sendTCP(newTransforms)
 						}
 						case _ => {
 
@@ -211,13 +212,9 @@ class Game(config: GameConfig) extends ApplicationAdapter with InputProcessor {
 			client.addListener(new Listener() {
 	       override def received(connection: Connection, obj: Object) {
 					 obj match {
-						 case response: Inputs => {
-							 receivedInputs = response
-							 hasReceivedInputs = true
-						 }
 						 case response: Array[TransformChange] => {
 							 newTransforms = response
-							 hasReceivedInputs = true
+							 waitingForInputs = false
 						 }
 						 case _ => { }
 					 }
@@ -241,6 +238,8 @@ class Game(config: GameConfig) extends ApplicationAdapter with InputProcessor {
 		env
 	}
 
+	var skipCount = 0
+
 	override def render(): Unit = {
 		Gdx.gl.glClearColor(0, 0, 0, 0)
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT)
@@ -251,33 +250,23 @@ class Game(config: GameConfig) extends ApplicationAdapter with InputProcessor {
 
 		val inputs = poll
 
-		// val currentTime = System.nanoTime
-		// val delta = (currentTime - time) / 1e9f
-		// time = currentTime
-
-		// scene.update(DELTA, AllInputs(inputs, inputs))
-
-
-		if (isHost && hasReceivedInputs) {
-			hasReceivedInputs = false
-			inputsToSend = inputs
-			val otherInputs = receivedInputs
-			canSend = true
-
-			scene.update(DELTA, AllInputs(inputsToSend, otherInputs))
-		} else if (isClient && !waitingForInputs) {
-			waitingForInputs = true
-	    client.sendTCP(inputs);
-		} else if (isClient && hasReceivedInputs) {
-			val otherInputs = receivedInputs
-			hasReceivedInputs = false
-			waitingForInputs = false
-
-			// scene.update(DELTA, AllInputs(inputs, otherInputs))
+		if (isClient) {
+			client.sendTCP(inputs)
 			scene.setPositions(newTransforms)
+			scene.updateVisual(DELTA, AllInputs(inputs, inputs))
 		}
-
-		scene.updateVisual(DELTA, AllInputs(inputs, inputs))
+		if (isHost) {
+			scene.update(DELTA, AllInputs(inputs, receivedInputs))
+			scene.updateVisual(DELTA, AllInputs(inputs, receivedInputs))
+			val nodes = scene.rootNode.flatten
+			val buff = ArrayBuffer[TransformChange]()
+			nodes.foreach { n =>
+				if (n.isDynamic) {
+					buff += TransformChange(n.name, n.localPosition, n.localRotation)
+				}
+			}
+			newTransforms = buff.toArray
+		}
 	}
 
 	def render(node: Node, batch: ModelBatch): Unit = {

@@ -29,7 +29,7 @@ import com.badlogic.gdx.physics.box2d.BodyDef.BodyType
 import com.kabanero.junction16.level.TestLevel
 
 class TestScene(iAmGood: Boolean) extends Scene {
-  val PLAYER_SPEED = 500.0f
+  val PLAYER_SPEED = 200.0f
   val CAMERA_SPEED = 1 / 5.0f
   val UP = new Vector3(0, 1, 0)
   val RIGHT = new Vector3(-1, 0, 0)
