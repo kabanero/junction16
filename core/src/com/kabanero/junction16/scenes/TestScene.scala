@@ -147,7 +147,7 @@ class TestScene(iAmGood: Boolean) extends Scene {
   val playerNode = {
 		val node = Node("player")
     node.isDynamic = true
-    node.localPosition.add(-5.0f, 0.6f, 0)
+    node.localPosition.add(-5.0f, 0.0f, 0)
 
     val bodyDef = new BodyDef()
     bodyDef.`type` = BodyType.DynamicBody
@@ -176,12 +176,7 @@ class TestScene(iAmGood: Boolean) extends Scene {
       node.updateMethods += ownMovement
     } else {
       node.updateMethods += otherMovement
-      val modelBuilder = new ModelBuilder()
-      val model = modelBuilder.createBox(
-        0.5f, 1.2f, 0.5f,
-        new Material(ColorAttribute.createDiffuse(Color.GREEN)),
-        Usage.Position | Usage.Normal);
-      val instance = new ModelInstance(model);
+      val instance = new ModelInstance(models("doc_body"));
       node.modelInstance = Some(instance);
     }
 
@@ -190,7 +185,7 @@ class TestScene(iAmGood: Boolean) extends Scene {
   val enemyNode = {
     val node = Node("enemy")
     node.isDynamic = true
-    node.localPosition.add(5.0f, 0.6f, 0)
+    node.localPosition.add(5.0f, 0.0f, 0)
 
     val bodyDef = new BodyDef()
     bodyDef.`type` = BodyType.DynamicBody
@@ -217,12 +212,7 @@ class TestScene(iAmGood: Boolean) extends Scene {
 
     if (iAmGood) {
       node.updateMethods += otherMovement
-      val modelBuilder = new ModelBuilder()
-      val model = modelBuilder.createBox(
-        0.5f, 1.2f, 0.5f,
-        new Material(ColorAttribute.createDiffuse(Color.RED)),
-        Usage.Position | Usage.Normal);
-      val instance = new ModelInstance(model);
+      val instance = new ModelInstance(models("evil_body"));
       node.modelInstance = Some(instance);
     } else {
       node.updateMethods += ownMovement
@@ -243,14 +233,9 @@ class TestScene(iAmGood: Boolean) extends Scene {
     val node = Node("player head")
     node.isDynamic = true
 
-    node.localPosition.add(0, 1.15f, 0)
+    node.localPosition.add(0, 1.25f, 0)
     if (!iAmGood) {
-      val modelBuilder = new ModelBuilder()
-      val model = modelBuilder.createBox(
-        0.5f, 0.5f, 0.5f,
-        new Material(ColorAttribute.createDiffuse(Color.GREEN)),
-        Usage.Position | Usage.Normal);
-      val instance = new ModelInstance(model);
+      val instance = new ModelInstance(models("doc_head"));
       node.modelInstance = Some(instance);
 
       node.updateMethods += otherHeadMovement
@@ -263,17 +248,12 @@ class TestScene(iAmGood: Boolean) extends Scene {
 
   val enemyHead = {
     val node = Node("enemy head")
-    node.localPosition.add(0, 1.15f, 0)
+    node.localPosition.add(0, 1.25f, 0)
 
     node.isDynamic = true
 
     if (iAmGood) {
-      val modelBuilder = new ModelBuilder()
-      val model = modelBuilder.createBox(
-        0.5f, 0.5f, 0.5f,
-        new Material(ColorAttribute.createDiffuse(Color.RED)),
-        Usage.Position | Usage.Normal);
-      val instance = new ModelInstance(model);
+      val instance = new ModelInstance(models("evil_head"));
       node.modelInstance = Some(instance);
 
       node.updateMethods += otherHeadMovement
