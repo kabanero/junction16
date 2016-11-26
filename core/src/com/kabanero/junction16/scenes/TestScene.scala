@@ -267,7 +267,7 @@ class TestScene(iAmGood: Boolean) extends Scene {
     val body = world.createBody(bodyDef)
 
     val circle = new CircleShape()
-    circle.setRadius(0.2f)
+    circle.setRadius(0.1f)
 
     val fixtureDef = new FixtureDef()
     fixtureDef.shape = circle
@@ -317,7 +317,7 @@ class TestScene(iAmGood: Boolean) extends Scene {
     val body = world.createBody(bodyDef)
 
     val circle = new CircleShape()
-    circle.setRadius(0.25f)
+    circle.setRadius(0.1f)
 
     val fixtureDef = new FixtureDef()
     fixtureDef.shape = circle

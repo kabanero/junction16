@@ -65,6 +65,8 @@ abstract class SubLevel(
     groundBodyDef.`type` = BodyType.DynamicBody
     groundBodyDef.position.set(new Vector2(node.localPosition.x, node.localPosition.z));
     groundBodyDef.angle = rotation/180.0f * Math.PI.toFloat;
+    groundBodyDef.linearDamping = 1.0f
+    groundBodyDef.angularDamping = 1.0f
     val groundBody = world.createBody(groundBodyDef)
 
     val groundBox = new PolygonShape()
@@ -72,7 +74,7 @@ abstract class SubLevel(
 
     val fixtureDef = new FixtureDef()
     fixtureDef.shape = groundBox
-    fixtureDef.density = 0.5f
+    fixtureDef.density = 10.0f
     fixtureDef.friction = 0.4f
     fixtureDef.restitution = 0.0f
 
