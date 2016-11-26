@@ -21,6 +21,7 @@ class TestScene extends Scene {
 
   val playerNode = {
 		val node = Node("player")
+    node.localPosition.add(-5.0f, 0, 0)
 
 		node.updateMethods += ((delta: Float, node: Node, inputs: AllInputs) => {
       val rotationY = new Quaternion(UP, -inputs.ownInputs.mouseX * CAMERA_SPEED)
@@ -54,6 +55,51 @@ class TestScene extends Scene {
 
 		node
 	}
+
+  val enemyNode = {
+    val node = Node("enemy")
+    node.localPosition.add(5.0f, 0, 0)
+
+    val modelBuilder = new ModelBuilder()
+    val model = modelBuilder.createBox(
+      1, 1, 1,
+      new Material(ColorAttribute.createDiffuse(Color.RED)),
+      Usage.Position | Usage.Normal);
+    val instance = new ModelInstance(model);
+    node.modelInstance = Some(instance);
+
+    node.updateMethods += ((delta: Float, node: Node, inputs: AllInputs) => {
+      val rotationY = new Quaternion(UP, -inputs.ownInputs.mouseX * CAMERA_SPEED)
+      val rotationX = new Quaternion(RIGHT, -inputs.ownInputs.mouseY * CAMERA_SPEED)
+      node.localRotation.set(rotationY.mul(rotationX))
+
+      val moveDirection = new Vector3(0, 0, 0)
+
+      val forwardMove = node.forward
+      forwardMove.y = 0
+      forwardMove.nor()
+      val rightMove = node.right
+      rightMove.y = 0
+      rightMove.nor()
+			if (inputs.otherInputs.up) {
+				moveDirection.z += 1
+			}
+			if (inputs.otherInputs.down) {
+				moveDirection.z -= 1
+			}
+			if (inputs.otherInputs.left) {
+				moveDirection.x += 1
+			}
+			if (inputs.otherInputs.right) {
+				moveDirection.x -= 1
+			}
+
+      node.localPosition.add(forwardMove.scl(moveDirection.z * delta * PLAYER_SPEED))
+      node.localPosition.add(rightMove.scl(moveDirection.x * delta * PLAYER_SPEED))
+		})
+
+		node
+  }
 
   cameraNode.updateVisualMethods +=((delta: Float, node: Node, inputs: AllInputs) => {
     val rotationY = new Quaternion(UP, -inputs.ownInputs.mouseX * CAMERA_SPEED)
@@ -89,5 +135,6 @@ class TestScene extends Scene {
 	}
 
   rootNode.addChild(playerNode)
+  rootNode.addChild(enemyNode)
   rootNode.addChild(cubeNode)
 }

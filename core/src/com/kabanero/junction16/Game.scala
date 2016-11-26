@@ -199,7 +199,7 @@ class Game(config: GameConfig) extends ApplicationAdapter with InputProcessor {
 			val otherInputs = receivedInputs
 			canSend = true
 
-			scene.update(DELTA, AllInputs(otherInputs, inputsToSend))
+			scene.update(DELTA, AllInputs(inputsToSend, otherInputs))
 		} else if (isClient && !waitingForInputs) {
 			waitingForInputs = true
 	    client.sendTCP(inputs);
@@ -208,7 +208,7 @@ class Game(config: GameConfig) extends ApplicationAdapter with InputProcessor {
 			hasReceivedInputs = false
 			waitingForInputs = false
 
-			scene.update(DELTA, AllInputs(otherInputs, inputs))
+			scene.update(DELTA, AllInputs(inputs, otherInputs))
 		}
 
 		scene.updateVisual(DELTA, AllInputs(inputs, inputs))
