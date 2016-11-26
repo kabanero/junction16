@@ -273,7 +273,7 @@ class Game(config: GameConfig) extends ApplicationAdapter with InputProcessor {
 			hasReceivedInputs = false
 			waitingForInputs = false
 
-			// scene.update(DELTA, AllInputs(inputs, otherInputs))]
+			// scene.update(DELTA, AllInputs(inputs, otherInputs))
 			scene.setPositions(newTransforms)
 		}
 

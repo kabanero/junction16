@@ -119,18 +119,30 @@ class TestScene(iAmGood: Boolean) extends Scene {
   models("doc_head") = modelLoader.loadModel(Gdx.files.internal("doc_head.g3dj"))
   models("doc_body") = modelLoader.loadModel(Gdx.files.internal("doc_body.g3dj"))
 
+  models("doc_head_attack") = modelLoader.loadModel(Gdx.files.internal("doc_head_attack.g3dj"))
+  models("doc_body_attack") = modelLoader.loadModel(Gdx.files.internal("doc_body_attack.g3dj"))
+
   models("ent_cabinet") = modelLoader.loadModel(Gdx.files.internal("ent_cabinet.g3dj"))
   models("ent_chair") = modelLoader.loadModel(Gdx.files.internal("ent_chair.g3dj"))
+  models("ent_coffee_table") = modelLoader.loadModel(Gdx.files.internal("ent_coffee_table.g3dj"))
   models("ent_desk") = modelLoader.loadModel(Gdx.files.internal("ent_desk.g3dj"))
   models("ent_device_ctrl_panel") = modelLoader.loadModel(Gdx.files.internal("ent_device_ctrl_panel.g3dj"))
   models("ent_device_iv") = modelLoader.loadModel(Gdx.files.internal("ent_device_iv.g3dj"))
   models("ent_device_screens") = modelLoader.loadModel(Gdx.files.internal("ent_device_screens.g3dj"))
+  models("ent_sofa") = modelLoader.loadModel(Gdx.files.internal("ent_sofa.g3dj"))
   models("ent_stand") = modelLoader.loadModel(Gdx.files.internal("ent_stand.g3dj"))
   models("ent_stool") = modelLoader.loadModel(Gdx.files.internal("ent_stool.g3dj"))
+  models("ent_table_coffee_machine") = modelLoader.loadModel(Gdx.files.internal("ent_table_coffee_machine.g3dj"))
   models("ent_table") = modelLoader.loadModel(Gdx.files.internal("ent_table.g3dj"))
+
   models("evil_body") = modelLoader.loadModel(Gdx.files.internal("evil_body.g3dj"))
   models("evil_head") = modelLoader.loadModel(Gdx.files.internal("evil_head.g3dj"))
+
+  models("evil_body_attack") = modelLoader.loadModel(Gdx.files.internal("evil_body_attack.g3dj"))
+  models("evil_head_attack") = modelLoader.loadModel(Gdx.files.internal("evil_head_attack.g3dj"))
+
   models("npc_doctor") = modelLoader.loadModel(Gdx.files.internal("npc_doctor.g3dj"))
+  models("npc_doctor_dead") = modelLoader.loadModel(Gdx.files.internal("npc_doctor_dead.g3dj"))
 
 
 
