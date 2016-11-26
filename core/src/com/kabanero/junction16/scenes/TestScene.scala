@@ -36,6 +36,7 @@ class TestScene(iAmGood: Boolean) extends Scene {
   val world = new World(new Vector2(0, 0), true)
 
   val models = Map[String, Model]()
+  val collisionSizes = Map[String, Tuple2[Float, Float]]()
 
   def ownMovement(delta: Float, node: Node, inputs: AllInputs) {
     val rotationY = new Quaternion(UP, -inputs.ownInputs.mouseX * CAMERA_SPEED)
@@ -123,17 +124,40 @@ class TestScene(iAmGood: Boolean) extends Scene {
   models("doc_body_attack") = modelLoader.loadModel(Gdx.files.internal("doc_body_attack.g3dj"))
 
   models("ent_cabinet") = modelLoader.loadModel(Gdx.files.internal("ent_cabinet.g3dj"))
+  collisionSizes("ent_cabinet") = (1f,1f)
+
   models("ent_chair") = modelLoader.loadModel(Gdx.files.internal("ent_chair.g3dj"))
+  collisionSizes("ent_chair") = (1f,1f)
+
   models("ent_coffee_table") = modelLoader.loadModel(Gdx.files.internal("ent_coffee_table.g3dj"))
+  collisionSizes("ent_coffee_table") = (02f,0.5f)
+
   models("ent_desk") = modelLoader.loadModel(Gdx.files.internal("ent_desk.g3dj"))
+  collisionSizes("ent_desk") = (1f,2f)
+
   models("ent_device_ctrl_panel") = modelLoader.loadModel(Gdx.files.internal("ent_device_ctrl_panel.g3dj"))
+  collisionSizes("ent_device_ctrl_panel") = (1f,1f)
+
   models("ent_device_iv") = modelLoader.loadModel(Gdx.files.internal("ent_device_iv.g3dj"))
+  collisionSizes("ent_device_iv") = (0.5f,0.5f)
+
   models("ent_device_screens") = modelLoader.loadModel(Gdx.files.internal("ent_device_screens.g3dj"))
+  collisionSizes("ent_device_screens") = (1.1f,1.1f)
+
   models("ent_sofa") = modelLoader.loadModel(Gdx.files.internal("ent_sofa.g3dj"))
+  collisionSizes("ent_sofa") = (2.3f,1.1f)
+
   models("ent_stand") = modelLoader.loadModel(Gdx.files.internal("ent_stand.g3dj"))
+  collisionSizes("ent_stand") = (0.5f,0.5f)
+
   models("ent_stool") = modelLoader.loadModel(Gdx.files.internal("ent_stool.g3dj"))
+  collisionSizes("ent_stool") = (0.5f,0.5f)
+
   models("ent_table_coffee_machine") = modelLoader.loadModel(Gdx.files.internal("ent_table_coffee_machine.g3dj"))
+  collisionSizes("ent_table_coffee_machine") = (1f,1f)
+
   models("ent_table") = modelLoader.loadModel(Gdx.files.internal("ent_table.g3dj"))
+  collisionSizes("ent_table_coffee_machine") = (1f,1f)
 
   models("evil_body") = modelLoader.loadModel(Gdx.files.internal("evil_body.g3dj"))
   models("evil_head") = modelLoader.loadModel(Gdx.files.internal("evil_head.g3dj"))
@@ -142,7 +166,10 @@ class TestScene(iAmGood: Boolean) extends Scene {
   models("evil_head_attack") = modelLoader.loadModel(Gdx.files.internal("evil_head_attack.g3dj"))
 
   models("npc_doctor") = modelLoader.loadModel(Gdx.files.internal("npc_doctor.g3dj"))
+  collisionSizes("npc_doctor") = (0.5f,0.5f)
+
   models("npc_doctor_dead") = modelLoader.loadModel(Gdx.files.internal("npc_doctor_dead.g3dj"))
+  collisionSizes("npc_doctor_dead") = (0.5f,0.5f)
 
 
 
