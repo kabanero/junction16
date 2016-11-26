@@ -147,7 +147,7 @@ class Game(config: GameConfig) extends ApplicationAdapter with InputProcessor {
 							hasReceivedInputs = true
 							receivedInputs = inputs
 							while (!canSend) {
-								Thread.sleep(1)
+								Thread.sleep(2)
 							}
 							val response = inputsToSend
 							canSend = false
@@ -186,6 +186,10 @@ class Game(config: GameConfig) extends ApplicationAdapter with InputProcessor {
 
 	override def render(): Unit = {
 		val inputs = poll
+
+		// val currentTime = System.nanoTime
+		// val delta = (currentTime - time) / 1e9f
+		// time = currentTime
 
 		// scene.update(DELTA, AllInputs(inputs, inputs))
 

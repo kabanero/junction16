@@ -71,15 +71,6 @@ case class Node(
     modelInstance.foreach(instance => {
       instance.transform = worldTransform()
     })
-    cam.foreach(cam => {
-      val localMat = localTransform
-      val mat = localMat.getValues()
-      cam.position.set(position)
-
-      cam.up.set(new Vector3(mat(Matrix4.M01), mat(Matrix4.M11), mat(Matrix4.M21)))
-      cam.direction.set(new Vector3(mat(Matrix4.M02), mat(Matrix4.M12), mat(Matrix4.M22)))
-      cam.update()
-    })
     children.foreach(child => {
       child.update(delta, inputs)
     })
@@ -89,6 +80,15 @@ case class Node(
     updateVisualMethods.foreach { method =>
       method(delta, this, inputs)
     }
+    cam.foreach(cam => {
+      val localMat = localTransform
+      val mat = localMat.getValues()
+      cam.position.set(position)
+
+      cam.up.set(new Vector3(mat(Matrix4.M01), mat(Matrix4.M11), mat(Matrix4.M21)))
+      cam.direction.set(new Vector3(mat(Matrix4.M02), mat(Matrix4.M12), mat(Matrix4.M22)))
+      cam.update()
+    })
     children.foreach(child => {
       child.updateVisual(delta, inputs)
     })
