@@ -22,11 +22,15 @@ import com.badlogic.gdx.graphics.g3d.Material
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.Input.Keys
+import com.badlogic.gdx.graphics.g3d.loader.G3dModelLoader
+import com.badlogic.gdx.utils.UBJsonReader
+import com.badlogic.gdx.Files.FileType
 
-
-import java.io.BufferedReader;
-import java.io.IOException;
+import java.io.BufferedReader
+import java.io.IOException
 import java.io.InputStreamReader
+
+import scala.collection.mutable.Map
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
@@ -88,7 +92,13 @@ class Game(config: GameConfig) extends ApplicationAdapter with InputProcessor {
 	val isHost = config.host
 	val isClient = !isHost
 
+  lazy val jsonReader = new UBJsonReader();
+  lazy val modelLoader = new G3dModelLoader(jsonReader);
+
+	val models = Map[String, Model]()
+
 	lazy val batch = new ModelBatch()
+
 	lazy val img = new Texture("badlogic.jpg")
 	lazy val server = new Server()
 	lazy val client = new Client()
@@ -132,6 +142,7 @@ class Game(config: GameConfig) extends ApplicationAdapter with InputProcessor {
 		Gdx.input.setInputProcessor(this)
 		Gdx.input.setCursorCatched(true)
 		Gdx.input.setCursorPosition(0, 0)
+
 		kryo.register(classOf[SomeRequest])
     kryo.register(classOf[SomeResponse])
     kryo.register(classOf[Inputs])
@@ -192,6 +203,7 @@ class Game(config: GameConfig) extends ApplicationAdapter with InputProcessor {
 		// time = currentTime
 
 		// scene.update(DELTA, AllInputs(inputs, inputs))
+
 
 		if (isHost && hasReceivedInputs) {
 			hasReceivedInputs = false

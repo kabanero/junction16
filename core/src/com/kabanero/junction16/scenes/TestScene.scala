@@ -12,6 +12,12 @@ import com.badlogic.gdx.math.Quaternion
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute
 import com.badlogic.gdx.graphics.g3d.Material
+import com.badlogic.gdx.graphics.g3d.Model
+import com.badlogic.gdx.assets.AssetManager
+import com.badlogic.gdx.graphics.g3d.loader.G3dModelLoader
+import com.badlogic.gdx.utils.UBJsonReader
+import com.badlogic.gdx.utils.JsonReader
+import com.badlogic.gdx.Files.FileType
 
 class TestScene(iAmGood: Boolean) extends Scene {
   val PLAYER_SPEED = 5.0f
@@ -79,6 +85,11 @@ class TestScene(iAmGood: Boolean) extends Scene {
     node.localPosition.add(rightMove.scl(moveDirection.x * delta * PLAYER_SPEED))
   }
 
+  val jsonReader = new JsonReader()
+  val modelLoader = new G3dModelLoader(jsonReader);
+
+	val testmodel = modelLoader.loadModel(Gdx.files.internal("test.g3dj"))
+
   val playerNode = {
 		val node = Node("player")
     node.localPosition.add(-5.0f, 0, 0)
@@ -95,7 +106,7 @@ class TestScene(iAmGood: Boolean) extends Scene {
       val instance = new ModelInstance(model);
       node.modelInstance = Some(instance);
     }
-    
+
     node
   }
   val enemyNode = {
@@ -137,12 +148,12 @@ class TestScene(iAmGood: Boolean) extends Scene {
 	val cubeNode = {
 		val node = Node("cube")
 
-		val modelBuilder = new ModelBuilder()
-		val model = modelBuilder.createBox(
-			5, 5, 5,
-			new Material(ColorAttribute.createDiffuse(Color.GREEN)),
-			Usage.Position | Usage.Normal);
-		val instance = new ModelInstance(model);
+		// val modelBuilder = new ModelBuilder()
+		// val model = modelBuilder.createBox(
+		// 	5, 5, 5,
+		// 	new Material(ColorAttribute.createDiffuse(Color.GREEN)),
+		// 	Usage.Position | Usage.Normal);
+		val instance = new ModelInstance(testmodel);
 		node.modelInstance = Some(instance);
 
 		node.localPosition = new Vector3(0, 0, 8)
