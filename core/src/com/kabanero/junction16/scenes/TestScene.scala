@@ -28,7 +28,7 @@ class TestScene(iAmGood: Boolean) extends Scene {
   def ownMovement(delta: Float, node: Node, inputs: AllInputs) {
     val rotationY = new Quaternion(UP, -inputs.ownInputs.mouseX * CAMERA_SPEED)
     val rotationX = new Quaternion(RIGHT, -inputs.ownInputs.mouseY * CAMERA_SPEED)
-    node.localRotation.set(rotationY.mul(rotationX))
+    node.localRotation.set(rotationY)
 
     val moveDirection = new Vector3(0, 0, 0)
 
@@ -58,7 +58,7 @@ class TestScene(iAmGood: Boolean) extends Scene {
   def otherMovement(delta: Float, node: Node, inputs: AllInputs) {
     val rotationY = new Quaternion(UP, -inputs.otherInputs.mouseX * CAMERA_SPEED)
     val rotationX = new Quaternion(RIGHT, -inputs.otherInputs.mouseY * CAMERA_SPEED)
-    node.localRotation.set(rotationY.mul(rotationX))
+    node.localRotation.set(rotationY)
 
     val moveDirection = new Vector3(0, 0, 0)
 
@@ -90,9 +90,14 @@ class TestScene(iAmGood: Boolean) extends Scene {
 
 	val testmodel = modelLoader.loadModel(Gdx.files.internal("test.g3dj"))
 
+  def otherHeadMovement(delta: Float, node: Node, inputs: AllInputs) {
+    val rotationX = new Quaternion(RIGHT, -inputs.otherInputs.mouseY * CAMERA_SPEED)
+    node.localRotation.set(rotationX)
+  }
+
   val playerNode = {
 		val node = Node("player")
-    node.localPosition.add(-5.0f, 0, 0)
+    node.localPosition.add(-5.0f, 0.6f, 0)
 
     if (iAmGood) {
       node.updateMethods += ownMovement
@@ -100,7 +105,7 @@ class TestScene(iAmGood: Boolean) extends Scene {
       node.updateMethods += otherMovement
       val modelBuilder = new ModelBuilder()
       val model = modelBuilder.createBox(
-        1, 1, 1,
+        0.5f, 1.2f, 0.5f,
         new Material(ColorAttribute.createDiffuse(Color.GREEN)),
         Usage.Position | Usage.Normal);
       val instance = new ModelInstance(model);
@@ -111,12 +116,12 @@ class TestScene(iAmGood: Boolean) extends Scene {
   }
   val enemyNode = {
     val node = Node("enemy")
-    node.localPosition.add(5.0f, 0, 0)
+    node.localPosition.add(5.0f, 0.6f, 0)
     if (iAmGood) {
       node.updateMethods += otherMovement
       val modelBuilder = new ModelBuilder()
       val model = modelBuilder.createBox(
-        1, 1, 1,
+        0.5f, 1.2f, 0.5f,
         new Material(ColorAttribute.createDiffuse(Color.RED)),
         Usage.Position | Usage.Normal);
       val instance = new ModelInstance(model);
@@ -138,12 +143,48 @@ class TestScene(iAmGood: Boolean) extends Scene {
 
   val playerHead = {
     val node = Node("head")
-    node.localPosition.add(0, 1.2f, 0)
+    node.localPosition.add(0, 1.15f, 0)
+    if (!iAmGood) {
+      val modelBuilder = new ModelBuilder()
+      val model = modelBuilder.createBox(
+        0.5f, 0.5f, 0.5f,
+        new Material(ColorAttribute.createDiffuse(Color.GREEN)),
+        Usage.Position | Usage.Normal);
+      val instance = new ModelInstance(model);
+      node.modelInstance = Some(instance);
+
+      node.updateMethods += otherHeadMovement
+    }
 
     node
   }
-  playerHead.addChild(cameraNode)
+
+  val enemyHead = {
+    val node = Node("head")
+    node.localPosition.add(0, 1.15f, 0)
+
+    if (iAmGood) {
+      val modelBuilder = new ModelBuilder()
+      val model = modelBuilder.createBox(
+        0.5f, 0.5f, 0.5f,
+        new Material(ColorAttribute.createDiffuse(Color.RED)),
+        Usage.Position | Usage.Normal);
+      val instance = new ModelInstance(model);
+      node.modelInstance = Some(instance);
+
+      node.updateMethods += otherHeadMovement
+    }
+
+    node
+  }
+
+  if (iAmGood) {
+    playerHead.addChild(cameraNode)
+  } else {
+    enemyHead.addChild(cameraNode)
+  }
   playerNode.addChild(playerHead)
+  enemyNode.addChild(enemyHead)
 
 	val cubeNode = {
 		val node = Node("cube")

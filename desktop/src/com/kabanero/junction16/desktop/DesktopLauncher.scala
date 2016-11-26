@@ -8,6 +8,11 @@ object DesktopLauncher {
 	def main (args: Array[String]) {
 		val gameConfig = ArgParser.parse(args);
 		val config = new LwjglApplicationConfiguration();
+		if (gameConfig.host) {
+			config.x = 0
+		} else {
+			config.x = 800
+		}
 		new LwjglApplication(new Game(gameConfig), config);
 	}
 }
