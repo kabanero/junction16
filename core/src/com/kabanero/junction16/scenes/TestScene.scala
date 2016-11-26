@@ -63,16 +63,10 @@ class TestScene(iAmGood: Boolean) extends Scene {
       moveDirection.x -= 1
     }
 
-    // val newPos = new Vector3(node.localPosition)
-
-    // body.setLinearVelocity()
-
     val velo = forwardMove.scl(moveDirection.z * delta * PLAYER_SPEED).add(rightMove.scl(moveDirection.x * delta * PLAYER_SPEED))
 
     body.setLinearVelocity(velo.x, velo.z)
 
-    // newPos.add(forwardMove.scl(moveDirection.z * delta * PLAYER_SPEED))
-    // newPos.add(rightMove.scl(moveDirection.x * delta * PLAYER_SPEED))
 
     val bodyPos = node.physicsBody.get.getPosition()
 
@@ -85,6 +79,8 @@ class TestScene(iAmGood: Boolean) extends Scene {
     node.localRotation.set(rotationY)
 
     val moveDirection = new Vector3(0, 0, 0)
+
+    val body = node.physicsBody.get
 
     val forwardMove = node.forward
     forwardMove.y = 0
@@ -105,8 +101,13 @@ class TestScene(iAmGood: Boolean) extends Scene {
       moveDirection.x -= 1
     }
 
-    node.localPosition.add(forwardMove.scl(moveDirection.z * delta * PLAYER_SPEED))
-    node.localPosition.add(rightMove.scl(moveDirection.x * delta * PLAYER_SPEED))
+    val velo = forwardMove.scl(moveDirection.z * delta * PLAYER_SPEED).add(rightMove.scl(moveDirection.x * delta * PLAYER_SPEED))
+
+    body.setLinearVelocity(velo.x, velo.z)
+
+    val bodyPos = node.physicsBody.get.getPosition()
+
+    node.localPosition = new Vector3(bodyPos.x, 0, bodyPos.y)
   }
 
   val jsonReader = new JsonReader()
@@ -187,7 +188,7 @@ class TestScene(iAmGood: Boolean) extends Scene {
     circle.dispose()
 
     node.physicsBody = Some(body)
-    
+
     if (iAmGood) {
       node.updateMethods += otherMovement
       val modelBuilder = new ModelBuilder()
