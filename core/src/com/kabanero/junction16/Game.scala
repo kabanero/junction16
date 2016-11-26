@@ -1,6 +1,7 @@
 package com.kabanero.junction16
 
 import com.badlogic.gdx.ApplicationAdapter
+import com.badlogic.gdx.InputProcessor
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.Texture
@@ -61,12 +62,14 @@ case class SomeResponse() {
 }
 
 object Inputs {
-	def apply(up: Boolean, right: Boolean, down: Boolean, left: Boolean) = {
+	def apply(up: Boolean, right: Boolean, down: Boolean, left: Boolean, mouseX: Int, mouseY: Int) = {
 		var i = new Inputs()
 		i.up = up
 		i.right = right
 		i.down = down
 		i.left = left
+		i.mouseX = mouseX
+		i.mouseY = mouseY
 		i
 	}
 }
@@ -75,11 +78,13 @@ case class Inputs() {
 	var right: Boolean = false
 	var down: Boolean = false
 	var left: Boolean = false
+	var mouseX: Int = 0
+	var mouseY: Int = 0
 }
 
 case class AllInputs(ownInputs: Inputs, otherInputs: Inputs);
 
-class Game(config: GameConfig) extends ApplicationAdapter {
+class Game(config: GameConfig) extends ApplicationAdapter with InputProcessor {
 	val isHost = config.host
 	val isClient = !isHost
 
@@ -98,16 +103,35 @@ class Game(config: GameConfig) extends ApplicationAdapter {
 
 	lazy val scene = new TestScene()
 
-	def poll: Inputs = {
-    val upState = Gdx.input.isKeyPressed(Keys.W);
-    val downState = Gdx.input.isKeyPressed(Keys.S);
-    val leftState = Gdx.input.isKeyPressed(Keys.A);
-    val rightState = Gdx.input.isKeyPressed(Keys.D);
+	var mouseX = 0
+	var mouseY = 0
 
-    Inputs(upState, rightState, downState, leftState);
+	def poll: Inputs = {
+    val upState = Gdx.input.isKeyPressed(Keys.W)
+    val downState = Gdx.input.isKeyPressed(Keys.S)
+    val leftState = Gdx.input.isKeyPressed(Keys.A)
+    val rightState = Gdx.input.isKeyPressed(Keys.D)
+
+    Inputs(upState, rightState, downState, leftState, mouseX, mouseY);
+  }
+
+	def keyDown(x$1: Int): Boolean = false
+	def keyTyped(x$1: Char): Boolean = false
+	def keyUp(x$1: Int): Boolean = false
+	def scrolled(x$1: Int): Boolean = false
+	def touchDown(x$1: Int,x$2: Int,x$3: Int,x$4: Int): Boolean = false
+	def touchDragged(x$1: Int,x$2: Int,x$3: Int): Boolean = false
+	def touchUp(x$1: Int,x$2: Int,x$3: Int,x$4: Int): Boolean = false
+	override def mouseMoved(screenX: Int, screenY: Int): Boolean = {
+		mouseX = screenX
+		mouseY = screenY
+    return false
   }
 
 	override def create(): Unit = {
+		Gdx.input.setInputProcessor(this)
+		Gdx.input.setCursorCatched(true)
+		Gdx.input.setCursorPosition(0, 0)
 		kryo.register(classOf[SomeRequest])
     kryo.register(classOf[SomeResponse])
     kryo.register(classOf[Inputs])
@@ -171,7 +195,7 @@ class Game(config: GameConfig) extends ApplicationAdapter {
 			val otherInputs = receivedInputs
 			canSend = true
 
-			scene.update(DELTA, AllInputs(otherInputs, inputs))
+			scene.update(DELTA, AllInputs(otherInputs, inputsToSend))
 		} else if (isClient && !waitingForInputs) {
 			waitingForInputs = true
 	    client.sendTCP(inputs);
@@ -182,6 +206,8 @@ class Game(config: GameConfig) extends ApplicationAdapter {
 
 			scene.update(DELTA, AllInputs(otherInputs, inputs))
 		}
+
+		scene.updateVisual(DELTA, AllInputs(inputs, inputs))
 
 		Gdx.gl.glClearColor(0, 0, 0, 0)
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT)

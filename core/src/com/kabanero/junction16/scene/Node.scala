@@ -17,6 +17,7 @@ case class Node(
   var parent: Option[Node] = None
   private var _children = ArrayBuffer[Node]()
   var updateMethods = ArrayBuffer[(Float, Node, AllInputs) => Unit]()
+  var updateVisualMethods = ArrayBuffer[(Float, Node, AllInputs) => Unit]()
 
   def children = {
     _children
@@ -71,13 +72,25 @@ case class Node(
       instance.transform = worldTransform()
     })
     cam.foreach(cam => {
+      val localMat = localTransform
+      val mat = localMat.getValues()
       cam.position.set(position)
-      cam.up.set(up)
-      cam.direction.set(forward)
+
+      cam.up.set(new Vector3(mat(Matrix4.M01), mat(Matrix4.M11), mat(Matrix4.M21)))
+      cam.direction.set(new Vector3(mat(Matrix4.M02), mat(Matrix4.M12), mat(Matrix4.M22)))
       cam.update()
     })
     children.foreach(child => {
       child.update(delta, inputs)
+    })
+  }
+
+  def updateVisual(delta: Float, inputs: AllInputs) {
+    updateVisualMethods.foreach { method =>
+      method(delta, this, inputs)
+    }
+    children.foreach(child => {
+      child.updateVisual(delta, inputs)
     })
   }
 

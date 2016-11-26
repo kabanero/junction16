@@ -8,35 +8,69 @@ import com.badlogic.gdx.graphics.g3d.ModelInstance
 import com.badlogic.gdx.graphics.VertexAttributes.Usage
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.math.Vector3
+import com.badlogic.gdx.math.Quaternion
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute
 import com.badlogic.gdx.graphics.g3d.Material
 
 class TestScene extends Scene {
-  val PLAYER_SPEED = 10.0f
+  val PLAYER_SPEED = 5.0f
+  val CAMERA_SPEED = 1 / 5.0f
+  val UP = new Vector3(0, 1, 0)
+  val RIGHT = new Vector3(-1, 0, 0)
 
   val playerNode = {
 		val node = Node("player")
 
 		node.updateMethods += ((delta: Float, node: Node, inputs: AllInputs) => {
+      val rotationY = new Quaternion(UP, -inputs.ownInputs.mouseX * CAMERA_SPEED)
+      val rotationX = new Quaternion(RIGHT, -inputs.ownInputs.mouseY * CAMERA_SPEED)
+      node.localRotation.set(rotationY.mul(rotationX))
+
+      val moveDirection = new Vector3(0, 0, 0)
+
+      val forwardMove = node.forward
+      forwardMove.y = 0
+      forwardMove.nor()
+      val rightMove = node.right
+      rightMove.y = 0
+      rightMove.nor()
 			if (inputs.ownInputs.up) {
-				node.localPosition.add(0, 0, delta * PLAYER_SPEED)
+				moveDirection.z += 1
 			}
 			if (inputs.ownInputs.down) {
-				node.localPosition.add(0, 0, -delta * PLAYER_SPEED)
+				moveDirection.z -= 1
 			}
 			if (inputs.ownInputs.left) {
-				node.localPosition.add(delta * PLAYER_SPEED, 0, 0)
+				moveDirection.x += 1
 			}
 			if (inputs.ownInputs.right) {
-				node.localPosition.add(-delta * PLAYER_SPEED, 0, 0)
+				moveDirection.x -= 1
 			}
+
+      node.localPosition.add(forwardMove.scl(moveDirection.z * delta * PLAYER_SPEED))
+      node.localPosition.add(rightMove.scl(moveDirection.x * delta * PLAYER_SPEED))
 		})
 
 		node
 	}
 
-  playerNode.addChild(cameraNode)
+  cameraNode.updateVisualMethods +=((delta: Float, node: Node, inputs: AllInputs) => {
+    val rotationY = new Quaternion(UP, -inputs.ownInputs.mouseX * CAMERA_SPEED)
+    val rotationX = new Quaternion(RIGHT, -inputs.ownInputs.mouseY * CAMERA_SPEED)
+    node.localRotation.set(rotationY.mul(rotationX))
+
+    node.localRotation.set(rotationY.mul(rotationX))
+  })
+
+  val playerHead = {
+    val node = Node("head")
+    node.localPosition.add(0, 1.2f, 0)
+
+    node
+  }
+  playerHead.addChild(cameraNode)
+  playerNode.addChild(playerHead)
 
 	val cubeNode = {
 		val node = Node("cube")
