@@ -36,6 +36,11 @@ class TestLevel(models: collection.mutable.Map[String, Model], world: World, col
 
   val mapModel = Node("mapModel")
   mapModel.modelInstance = Some(new ModelInstance(models("map_shape")))
+  levelRoot.addChild(mapModel)
+
+  val mapRoof = Node("mapRoof")
+  mapRoof.modelInstance = Some(new ModelInstance(models("map_roof")))
+  levelRoot.addChild(mapRoof)
 
   val office = new Office(models, collisionSizes, world) // 0, 0
   // val corridor = new Corridor(models, collisionSizes, world) // 9, 0
@@ -43,7 +48,7 @@ class TestLevel(models: collection.mutable.Map[String, Model], world: World, col
   // corridor.rootNode.localPosition = new Vector3(9, 0, 0)
 
   levelRoot.addChild(office.rootNode)
-  levelRoot.addChild(mapModel)
+
   // levelRoot.addChild(corridor.rootNode)
 
   levelRoot.addChild(floorNode)
