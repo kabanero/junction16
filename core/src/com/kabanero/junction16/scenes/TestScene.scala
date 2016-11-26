@@ -49,6 +49,9 @@ class TestScene(iAmGood: Boolean) extends Scene {
   models("doc_head_attack") = modelLoader.loadModel(Gdx.files.internal("doc_head_attack.g3dj"))
   models("doc_body_attack") = modelLoader.loadModel(Gdx.files.internal("doc_body_attack.g3dj"))
 
+  models("ent_bed") = modelLoader.loadModel(Gdx.files.internal("ent_bed.g3dj"))
+  collisionSizes("ent_bed") = (1f,0.5f)
+
   models("ent_cabinet") = modelLoader.loadModel(Gdx.files.internal("ent_cabinet.g3dj"))
   collisionSizes("ent_cabinet") = (0.5f,0.5f)
 
@@ -74,16 +77,16 @@ class TestScene(iAmGood: Boolean) extends Scene {
   collisionSizes("ent_sofa") = (1.15f,0.65f)
 
   models("ent_stand") = modelLoader.loadModel(Gdx.files.internal("ent_stand.g3dj"))
-  collisionSizes("ent_stand") = (0.5f,0.5f)
+  collisionSizes("ent_stand") = (0.25f,0.25f)
 
   models("ent_stool") = modelLoader.loadModel(Gdx.files.internal("ent_stool.g3dj"))
-  collisionSizes("ent_stool") = (0.5f,0.5f)
+  collisionSizes("ent_stool") = (0.25f,0.25f)
 
   models("ent_table_coffee_machine") = modelLoader.loadModel(Gdx.files.internal("ent_table_coffee_machine.g3dj"))
   collisionSizes("ent_table_coffee_machine") = (0.5f,0.5f)
 
   models("ent_table") = modelLoader.loadModel(Gdx.files.internal("ent_table.g3dj"))
-  collisionSizes("ent_table_coffee_machine") = (1f,1f)
+  collisionSizes("ent_table") = (0.5f,0.5f)
 
   models("evil_body") = modelLoader.loadModel(Gdx.files.internal("evil_body.g3dj"))
   models("evil_head") = modelLoader.loadModel(Gdx.files.internal("evil_head.g3dj"))
@@ -249,7 +252,7 @@ class TestScene(iAmGood: Boolean) extends Scene {
   val playerNode = {
 		val node = Node("player")
     node.isDynamic = true
-    node.localPosition.add(5.0f, 0, 10.0f)
+    node.localPosition.add(14.0f, 0, 5.0f)
 
     val bodyDef = new BodyDef()
     bodyDef.`type` = BodyType.DynamicBody
