@@ -5,6 +5,7 @@ import com.kabanero.junction16.scene.Node
 import com.kabanero.junction16.AllInputs
 import com.kabanero.junction16.collision.BoxCollider
 import com.kabanero.junction16.collision.SphereCollider
+import scala.collection.mutable.Map
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder
 import com.badlogic.gdx.graphics.g3d.ModelInstance
 import com.badlogic.gdx.graphics.VertexAttributes.Usage
@@ -33,6 +34,8 @@ class TestScene(iAmGood: Boolean) extends Scene {
   val RIGHT = new Vector3(-1, 0, 0)
 
   val world = new World(new Vector2(0, 0), true)
+
+  val models = Map[String, Model]()
 
   def ownMovement(delta: Float, node: Node, inputs: AllInputs) {
     val rotationY = new Quaternion(UP, -inputs.ownInputs.mouseX * CAMERA_SPEED)
@@ -113,7 +116,23 @@ class TestScene(iAmGood: Boolean) extends Scene {
   val jsonReader = new JsonReader()
   val modelLoader = new G3dModelLoader(jsonReader);
 
-	val testmodel = modelLoader.loadModel(Gdx.files.internal("test.g3dj"))
+  models("doc_head") = modelLoader.loadModel(Gdx.files.internal("doc_head.g3dj"))
+  models("doc_body") = modelLoader.loadModel(Gdx.files.internal("doc_body.g3dj"))
+
+  models("ent_cabinet") = modelLoader.loadModel(Gdx.files.internal("ent_cabinet.g3dj"))
+  models("ent_chair") = modelLoader.loadModel(Gdx.files.internal("ent_chair.g3dj"))
+  models("ent_desk") = modelLoader.loadModel(Gdx.files.internal("ent_desk.g3dj"))
+  models("ent_device_ctrl_panel") = modelLoader.loadModel(Gdx.files.internal("ent_device_ctrl_panel.g3dj"))
+  models("ent_device_iv") = modelLoader.loadModel(Gdx.files.internal("ent_device_iv.g3dj"))
+  models("ent_device_screens") = modelLoader.loadModel(Gdx.files.internal("ent_device_screens.g3dj"))
+  models("ent_stand") = modelLoader.loadModel(Gdx.files.internal("ent_stand.g3dj"))
+  models("ent_stool") = modelLoader.loadModel(Gdx.files.internal("ent_stool.g3dj"))
+  models("ent_table") = modelLoader.loadModel(Gdx.files.internal("ent_table.g3dj"))
+  models("evil_body") = modelLoader.loadModel(Gdx.files.internal("evil_body.g3dj"))
+  models("evil_head") = modelLoader.loadModel(Gdx.files.internal("evil_head.g3dj"))
+  models("npc_doctor") = modelLoader.loadModel(Gdx.files.internal("npc_doctor.g3dj"))
+
+
 
   def otherHeadMovement(delta: Float, node: Node, inputs: AllInputs) {
     val rotationX = new Quaternion(RIGHT, -inputs.otherInputs.mouseY * CAMERA_SPEED)
@@ -261,7 +280,7 @@ class TestScene(iAmGood: Boolean) extends Scene {
 	val cubeNode = {
 		val node = Node("cube")
 
-		val instance = new ModelInstance(testmodel);
+		val instance = new ModelInstance(models("ent_device_screens"));
 		node.modelInstance = Some(instance);
 
 		node.localPosition = new Vector3(0, 0, 8)
