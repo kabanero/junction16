@@ -5,6 +5,9 @@ import com.badlogic.gdx.math.Quaternion
 import com.badlogic.gdx.math.Matrix4
 import com.badlogic.gdx.graphics.g3d.ModelInstance
 import com.badlogic.gdx.graphics.PerspectiveCamera
+import com.badlogic.gdx.physics.box2d.Body
+
+import com.kabanero.junction16.collision.Collider
 import scala.collection.mutable.ArrayBuffer
 import com.kabanero.junction16.AllInputs
 
@@ -18,6 +21,9 @@ case class Node(
   private var _children = ArrayBuffer[Node]()
   var updateMethods = ArrayBuffer[(Float, Node, AllInputs) => Unit]()
   var updateVisualMethods = ArrayBuffer[(Float, Node, AllInputs) => Unit]()
+  var modelInstance: Option[ModelInstance] = None
+  var cam: Option[PerspectiveCamera] = None
+  var physicsBody: Option[Body] = None
 
   def children = {
     _children
@@ -27,9 +33,6 @@ case class Node(
     children += node
     node.parent = Some(this)
   }
-
-  var modelInstance: Option[ModelInstance] = None
-  var cam: Option[PerspectiveCamera] = None
 
   def localTransform(): Matrix4 = {
     new Matrix4(localPosition, localRotation, localScale)
@@ -65,6 +68,7 @@ case class Node(
   }
 
   def update(delta: Float, inputs: AllInputs) {
+
     updateMethods.foreach { method =>
       method(delta, this, inputs)
     }

@@ -20,6 +20,8 @@ import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.VertexAttributes.Usage
 import com.badlogic.gdx.graphics.g3d.Material
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute
+import com.badlogic.gdx.graphics.g3d.Environment
+import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.Input.Keys
 import com.badlogic.gdx.graphics.g3d.loader.G3dModelLoader
@@ -195,7 +197,21 @@ class Game(config: GameConfig) extends ApplicationAdapter with InputProcessor {
 
 	val DELTA = 1/60.0f
 
+	lazy val lights = {
+		val env = new Environment();
+		env.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.4f, 0.4f, 0.4f, 1f));
+	  env.add(new DirectionalLight().set(0.8f, 0.8f, 0.8f, -1f, -0.8f, -0.2f));
+		env
+	}
+
 	override def render(): Unit = {
+		Gdx.gl.glClearColor(0, 0, 0, 0)
+		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT)
+
+		batch.begin(scene.cameraNode.cam.get)
+		render(scene.rootNode, batch)
+		batch.end()
+
 		val inputs = poll
 
 		// val currentTime = System.nanoTime
@@ -224,18 +240,11 @@ class Game(config: GameConfig) extends ApplicationAdapter with InputProcessor {
 		}
 
 		scene.updateVisual(DELTA, AllInputs(inputs, inputs))
-
-		Gdx.gl.glClearColor(0, 0, 0, 0)
-		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT)
-
-		batch.begin(scene.cameraNode.cam.get)
-		render(scene.rootNode, batch)
-		batch.end()
 	}
 
 	def render(node: Node, batch: ModelBatch): Unit = {
 		node.modelInstance.foreach { instance =>
-			batch.render(instance)
+			batch.render(instance, lights)
 		}
 		node.children.foreach { child =>
 			render(child, batch)
