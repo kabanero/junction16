@@ -125,8 +125,8 @@ class Game(config: GameConfig) extends ApplicationAdapter with InputProcessor {
 	lazy val batch = new ModelBatch()
 
 	lazy val img = new Texture("badlogic.jpg")
-	lazy val server = new Server()
-	lazy val client = new Client()
+	lazy val server = new Server(32768, 16384)
+	lazy val client = new Client(32768, 16384)
 	lazy val kryo = if (config.host) server.getKryo() else client.getKryo()
 
 	var inputsToSend = Inputs()

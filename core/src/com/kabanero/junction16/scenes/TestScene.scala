@@ -43,6 +43,8 @@ class TestScene(iAmGood: Boolean) extends Scene {
 
   val collisionSizes = Map[String, Tuple2[Float, Float]]()
 
+  models("map_shape") = modelLoader.loadModel(Gdx.files.internal("map_shape.g3dj"))
+
   models("doc_head") = modelLoader.loadModel(Gdx.files.internal("doc_head.g3dj"))
   models("doc_body") = modelLoader.loadModel(Gdx.files.internal("doc_body.g3dj"))
 

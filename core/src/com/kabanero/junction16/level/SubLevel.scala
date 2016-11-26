@@ -33,10 +33,10 @@ abstract class SubLevel(
 
   def createLevelNode(gridType: Int, x: Float, y: Float): Node = {
     val node = Node("level-" + x + "-" + y)
-    gridType match {
-      case 1 => node.modelInstance = Some(new ModelInstance(wallModel))
-      case _ => { }
-    }
+    // gridType match {
+    //   case 1 => node.modelInstance = Some(new ModelInstance(wallModel))
+    //   case _ => { }
+    // }
     node.localPosition = new Vector3(x, 1.5f, y)
 
     val groundBodyDef = new BodyDef();
