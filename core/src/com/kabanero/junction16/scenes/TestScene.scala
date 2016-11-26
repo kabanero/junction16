@@ -125,16 +125,16 @@ class TestScene(iAmGood: Boolean) extends Scene {
   models("doc_body_attack") = modelLoader.loadModel(Gdx.files.internal("doc_body_attack.g3dj"))
 
   models("ent_cabinet") = modelLoader.loadModel(Gdx.files.internal("ent_cabinet.g3dj"))
-  collisionSizes("ent_cabinet") = (1f,1f)
+  collisionSizes("ent_cabinet") = (0.5f,0.5f)
 
   models("ent_chair") = modelLoader.loadModel(Gdx.files.internal("ent_chair.g3dj"))
-  collisionSizes("ent_chair") = (1f,1f)
+  collisionSizes("ent_chair") = (0.5f,0.5f)
 
   models("ent_coffee_table") = modelLoader.loadModel(Gdx.files.internal("ent_coffee_table.g3dj"))
-  collisionSizes("ent_coffee_table") = (02f,0.5f)
+  collisionSizes("ent_coffee_table") = (2f,0.5f)
 
   models("ent_desk") = modelLoader.loadModel(Gdx.files.internal("ent_desk.g3dj"))
-  collisionSizes("ent_desk") = (1f,2f)
+  collisionSizes("ent_desk") = (0.5f,1f)
 
   models("ent_device_ctrl_panel") = modelLoader.loadModel(Gdx.files.internal("ent_device_ctrl_panel.g3dj"))
   collisionSizes("ent_device_ctrl_panel") = (1f,1f)
@@ -146,7 +146,7 @@ class TestScene(iAmGood: Boolean) extends Scene {
   collisionSizes("ent_device_screens") = (1.1f,1.1f)
 
   models("ent_sofa") = modelLoader.loadModel(Gdx.files.internal("ent_sofa.g3dj"))
-  collisionSizes("ent_sofa") = (2.3f,1.1f)
+  collisionSizes("ent_sofa") = (1.15f,0.65f)
 
   models("ent_stand") = modelLoader.loadModel(Gdx.files.internal("ent_stand.g3dj"))
   collisionSizes("ent_stand") = (0.5f,0.5f)
@@ -155,7 +155,7 @@ class TestScene(iAmGood: Boolean) extends Scene {
   collisionSizes("ent_stool") = (0.5f,0.5f)
 
   models("ent_table_coffee_machine") = modelLoader.loadModel(Gdx.files.internal("ent_table_coffee_machine.g3dj"))
-  collisionSizes("ent_table_coffee_machine") = (1f,1f)
+  collisionSizes("ent_table_coffee_machine") = (0.5f,0.5f)
 
   models("ent_table") = modelLoader.loadModel(Gdx.files.internal("ent_table.g3dj"))
   collisionSizes("ent_table_coffee_machine") = (1f,1f)
@@ -198,13 +198,13 @@ class TestScene(iAmGood: Boolean) extends Scene {
     val body = world.createBody(bodyDef)
 
     val circle = new CircleShape()
-    circle.setRadius(0.25f)
+    circle.setRadius(0.2f)
 
     val fixtureDef = new FixtureDef()
     fixtureDef.shape = circle
     fixtureDef.density = 0.5f
     fixtureDef.friction = 0.4f
-    fixtureDef.restitution = 0.6f
+    fixtureDef.restitution = 0.0f
 
     val fixture = body.createFixture(fixtureDef)
 
@@ -242,7 +242,7 @@ class TestScene(iAmGood: Boolean) extends Scene {
     fixtureDef.shape = circle
     fixtureDef.density = 0.5f
     fixtureDef.friction = 0.4f
-    fixtureDef.restitution = 0.6f
+    fixtureDef.restitution = 0.0f
 
     val fixture = body.createFixture(fixtureDef)
 
@@ -337,7 +337,7 @@ class TestScene(iAmGood: Boolean) extends Scene {
   rootNode.addChild(enemyNode)
   rootNode.addChild(cubeNode)
 
-  val level = new TestLevel(models, world)
+  val level = new TestLevel(models, world, collisionSizes)
   rootNode.addChild(level.levelRoot)
 
   override def update(delta: Float, inputs: AllInputs) = {

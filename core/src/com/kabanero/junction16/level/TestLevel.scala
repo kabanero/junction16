@@ -8,14 +8,14 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute
 import com.badlogic.gdx.graphics.VertexAttributes.Usage
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder
-import com.badlogic.gdx.physics.box2d._
-import com.badlogic.gdx.physics.box2d.BodyDef.BodyType
+import com.badlogic.gdx.physics.box2d.World
+// import com.badlogic.gdx.physics.box2d.BodyDef.BodyType
 
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.math.Vector3
 import com.badlogic.gdx.math.Quaternion
 
-class TestLevel(models: collection.mutable.Map[String, Model], world: World) {
+class TestLevel(models: collection.mutable.Map[String, Model], world: World, collisionSizes: collection.mutable.Map[String, Tuple2[Float, Float]]) {
   val levelRoot = Node("level root")
 
   val modelBuilder = new ModelBuilder();
@@ -34,54 +34,58 @@ class TestLevel(models: collection.mutable.Map[String, Model], world: World) {
     n
   }
 
+  val office = new Office(models, collisionSizes, world)
+
+  levelRoot.addChild(office.rootNode)
+
   levelRoot.addChild(floorNode)
+  //
+  // val level = Array(
+  //   Array(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
+  //   Array(1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1),
+  //   Array(1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1),
+  //   Array(1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1),
+  //   Array(1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1),
+  //   Array(1, 1, 1, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1),
+  //   Array(1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1),
+  //   Array(1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1),
+  //   Array(1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1),
+  //   Array(1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1),
+  //   Array(1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1),
+  //   Array(1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1),
+  //   Array(1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1),
+  //   Array(1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1),
+  //   Array(1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1),
+  //   Array(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1)
+  // )
+  //
+  // for (y <- 0 until level.length) {
+  //   for (x <- 0 until level(0).length) {
+  //     if (level(y)(x) != 0) {
+  //       val node = createLevelNode(level(y)(x), x, y)
+  //       levelRoot.addChild(node)
+  //     }
+  //   }
+  // }
 
-  val level = Array(
-    Array(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
-    Array(1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1),
-    Array(1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1),
-    Array(1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1),
-    Array(1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1),
-    Array(1, 1, 1, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1),
-    Array(1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1),
-    Array(1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1),
-    Array(1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1),
-    Array(1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1),
-    Array(1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1),
-    Array(1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1),
-    Array(1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1),
-    Array(1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1),
-    Array(1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1),
-    Array(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1)
-  )
-
-  for (y <- 0 until level.length) {
-    for (x <- 0 until level(0).length) {
-      if (level(y)(x) != 0) {
-        val node = createLevelNode(level(y)(x), x, y)
-        levelRoot.addChild(node)
-      }
-    }
-  }
-
-  def createLevelNode(gridType: Int, x: Int, y: Int): Node = {
-    val node = Node("level-" + x + "-" + y)
-    gridType match {
-      case 1 => node.modelInstance = Some(new ModelInstance(wallModel))
-      case _ => { }
-    }
-    node.localPosition = new Vector3(x - level(0).length/2, 1.5f, y - level.length / 2)
-
-    val groundBodyDef = new BodyDef();
-    groundBodyDef.position.set(new Vector2(node.localPosition.x, node.localPosition.z));
-    val groundBody = world.createBody(groundBodyDef)
-    val groundBox = new PolygonShape()
-    groundBox.setAsBox(1f, 1f)
-    groundBody.createFixture(groundBox, 0.0f)
-    groundBox.dispose()
-
-    node.physicsBody = Some(groundBody)
-
-    node
-  }
+  // def createLevelNode(gridType: Int, x: Int, y: Int): Node = {
+  //   val node = Node("level-" + x + "-" + y)
+  //   gridType match {
+  //     case 1 => node.modelInstance = Some(new ModelInstance(wallModel))
+  //     case _ => { }
+  //   }
+  //   node.localPosition = new Vector3(x, 1.5f, y )
+  //
+  //   val groundBodyDef = new BodyDef();
+  //   groundBodyDef.position.set(new Vector2(node.localPosition.x, node.localPosition.z));
+  //   val groundBody = world.createBody(groundBodyDef)
+  //   val groundBox = new PolygonShape()
+  //   groundBox.setAsBox(1f, 1f)
+  //   groundBody.createFixture(groundBox, 0.0f)
+  //   groundBox.dispose()
+  //
+  //   node.physicsBody = Some(groundBody)
+  //
+  //   node
+  // }
 }
