@@ -26,6 +26,7 @@ import com.badlogic.gdx.physics.box2d
 import com.badlogic.gdx.physics.box2d.World
 import com.badlogic.gdx.physics.box2d._
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType
+import com.kabanero.junction16.level.TestLevel
 
 class TestScene(iAmGood: Boolean) extends Scene {
   val PLAYER_SPEED = 500.0f
@@ -335,6 +336,9 @@ class TestScene(iAmGood: Boolean) extends Scene {
   rootNode.addChild(playerNode)
   rootNode.addChild(enemyNode)
   rootNode.addChild(cubeNode)
+
+  val level = new TestLevel(models, world)
+  rootNode.addChild(level.levelRoot)
 
   override def update(delta: Float, inputs: AllInputs) = {
     super.update(delta, inputs)
