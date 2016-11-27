@@ -57,7 +57,7 @@ abstract class SubLevel(
       val rotationY = new Quaternion(UP, -inputs.ownInputs.mouseX / 5.0f)
       val body = node.physicsBody.get
 
-      node.localRotation.set(rotationY)
+      // node.localRotation.set(rotationY)
 
       val moveDirection = new Vector3(0, 0, 0)
 

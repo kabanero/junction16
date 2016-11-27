@@ -136,6 +136,7 @@ class TestScene(iAmGood: Boolean) extends Scene {
 
     val body = node.physicsBody.get
 
+
     node.localRotation.set(rotationY)
 
     val moveDirection = new Vector3(0, 0, 0)
@@ -179,13 +180,51 @@ class TestScene(iAmGood: Boolean) extends Scene {
   val enemyAttackModel = new ModelInstance(models("evil_body_attack"));
   val enemyHeadAttackModel = new ModelInstance(models("evil_head_attack"));
 
+  var charge = 0.0f
+
   def playerAction(delta: Float, node: Node, inputs: AllInputs) {
     if (iAmGood) {
       val actionState = inputs.ownInputs.action
       node.isAttacking = actionState
     } else {
+      charge += delta
+      if (charge > 7.0f) {
+        charge = 7.0f;
+      }
       val actionState = inputs.otherInputs.action
       node.isAttacking = actionState
+
+      if (actionState) {
+        val nodes = rootNode.flatten
+
+        val probePos = new Vector3(node.localPosition)
+        probePos.add(node.forward)
+
+        var distance = 1.1f
+        var found: Option[Node] = None
+
+        nodes.foreach { otherNode =>
+          if (otherNode.name != node.name && otherNode.isDynamic) {
+            val diff = new Vector3(otherNode.localPosition)
+            diff.sub(probePos)
+            val l = diff.len
+            if (l < distance) {
+              distance = l
+              found = Some(otherNode)
+            }
+          }
+        }
+        if (found.isDefined) {
+          val f = new Vector2(node.forward.x, node.forward.z).nor()
+          found.get.physicsBody.get.applyLinearImpulse(
+            f.x * charge * 7.0f,
+            f.y * charge * 7.0f,
+            probePos.x,
+            probePos.z,
+            true)
+          charge = 0.0f
+        }
+      }
     }
   }
 
@@ -198,22 +237,6 @@ class TestScene(iAmGood: Boolean) extends Scene {
       node.isAttacking = actionState
     }
   }
-
-  // var unPressed = false
-  //
-  // def unpossessScript(delta: Float, node: Node, inputs: AllInputs) {
-  //   if (inputs.ownInputs.action) {
-  //     if (unPressed) {
-  //       println("UNPOSSESS")
-  //       node.children -= cameraNode
-  //       enemyHead.addChild(cameraNode)
-  //       node.updateMethods(0) = (delta: Float, node: Node, inputs: AllInputs) => {}
-  //       unPressed = false
-  //     }
-  //   } else {
-  //     unPressed = true
-  //   }
-  // }
 
   var possessTimer = 0.0f
 
