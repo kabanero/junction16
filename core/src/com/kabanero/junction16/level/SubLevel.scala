@@ -15,6 +15,7 @@ import com.kabanero.junction16.AllInputs
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.math.Vector3
 import com.badlogic.gdx.math.Quaternion
+import com.badlogic.gdx.math.Matrix4
 
 abstract class SubLevel(
     name: String,
@@ -57,7 +58,44 @@ abstract class SubLevel(
       val rotationY = new Quaternion(UP, -inputs.ownInputs.mouseX / 5.0f)
       val body = node.physicsBody.get
 
-      // node.localRotation.set(rotationY)
+      val moveDirection = new Vector3(0, 0, 0)
+
+      val mat = new Array[Float](16)
+
+      rotationY.toMatrix(mat)
+
+      val forwardMove = new Vector3(mat(Matrix4.M02), mat(Matrix4.M12), mat(Matrix4.M22))
+      forwardMove.y = 0
+      forwardMove.nor()
+      val rightMove = node.right
+      rightMove.y = 0
+      rightMove.nor()
+      if (inputs.ownInputs.up) {
+        moveDirection.z += 1
+      }
+      if (inputs.ownInputs.down) {
+        moveDirection.z -= 1
+      }
+      if (inputs.ownInputs.left) {
+        moveDirection.x += 1
+      }
+      if (inputs.ownInputs.right) {
+        moveDirection.x -= 1
+      }
+
+      val velo = forwardMove.scl(moveDirection.z * delta * 30).add(rightMove.scl(moveDirection.x * delta * 30))
+
+      body.setLinearVelocity(velo.x, velo.z)
+    }
+  }
+
+  def fastMovement(delta: Float, node: Node, inputs: AllInputs) {
+    if (node.isPossessed) {
+      val rotationY = new Quaternion(UP, -inputs.ownInputs.mouseX / 5.0f)
+      val body = node.physicsBody.get
+
+      node.localRotation.set(rotationY)
+      node.overrideRotation = true
 
       val moveDirection = new Vector3(0, 0, 0)
 
@@ -80,7 +118,7 @@ abstract class SubLevel(
         moveDirection.x -= 1
       }
 
-      val velo = forwardMove.scl(moveDirection.z * delta * 20).add(rightMove.scl(moveDirection.x * delta * 20))
+      val velo = forwardMove.scl(moveDirection.z * delta * 110).add(rightMove.scl(moveDirection.x * delta * 110))
 
       body.setLinearVelocity(velo.x, velo.z)
     }
@@ -125,6 +163,44 @@ abstract class SubLevel(
     node
 
   }
+
+  def genNPC(x: Float, z: Float): Node = {
+    val node = Node("NPC|" + x + "|" + z)
+    node.localPosition.set(new Vector3(x, 0, z))
+    node.modelInstance = Some(new ModelInstance(models("npc_doctor")))
+
+    val bodyDef = new BodyDef()
+    bodyDef.`type` = BodyType.DynamicBody
+    bodyDef.fixedRotation = true
+    bodyDef.position.set(
+      node.localPosition.x,
+      node.localPosition.z)
+
+    val body = world.createBody(bodyDef)
+
+    val circle = new CircleShape()
+    circle.setRadius(0.1f)
+
+    val fixtureDef = new FixtureDef()
+    fixtureDef.shape = circle
+    fixtureDef.density = 0.5f
+    fixtureDef.friction = 0.4f
+    fixtureDef.restitution = 0.0f
+
+    val fixture = body.createFixture(fixtureDef)
+
+    circle.dispose()
+
+    node.physicsBody = Some(body)
+
+    node.isDynamic = true
+
+    node.updateMethods += fastMovement
+
+    node
+  }
+
+  rootNode.addChild(genNPC(14, 4))
 
   val UP = new Vector3(0, 1, 0)
 

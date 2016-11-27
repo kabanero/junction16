@@ -283,7 +283,7 @@ class TestScene(iAmGood: Boolean) extends Scene {
             playerWon = false
           }
           node.children(0).children -= cameraNode
-          cameraNode.localPosition.set(new Vector3(0, 1, 0))
+          cameraNode.localPosition.set(new Vector3(0, 1.4f, 0))
           val foundNode = found.get
           foundNode.addChild(cameraNode)
           foundNode.isPossessed = true
@@ -426,7 +426,6 @@ class TestScene(iAmGood: Boolean) extends Scene {
 
     val bodyDef = new BodyDef()
     bodyDef.`type` = BodyType.DynamicBody
-    bodyDef.fixedRotation = true
     bodyDef.position.set(
       node.localPosition.x,
       node.localPosition.z)
@@ -532,6 +531,7 @@ class TestScene(iAmGood: Boolean) extends Scene {
   }
   playerNode.addChild(playerHead)
   enemyNode.addChild(enemyHead)
+
 
 	// val cubeNode = {
 	// 	val node = Node("screen thingy")
