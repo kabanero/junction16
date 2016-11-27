@@ -45,9 +45,9 @@ class TestScene(iAmGood: Boolean) extends Scene {
 
   models("map_shape") = modelLoader.loadModel(Gdx.files.internal("map_shape.g3dj"))
   models("map_roof") = modelLoader.loadModel(Gdx.files.internal("map_roof.g3dj"))
-
-  models("doc_hands") = modelLoader.loadModel(Gdx.files.internal("doc_hands.g3dj"))
-  models("evil_hands") = modelLoader.loadModel(Gdx.files.internal("evil_hands.g3dj"))
+  //
+  // models("doc_hands") = modelLoader.loadModel(Gdx.files.internal("doc_hands.g3dj"))
+  // models("evil_hands") = modelLoader.loadModel(Gdx.files.internal("evil_hands.g3dj"))
 
   models("doc_head") = modelLoader.loadModel(Gdx.files.internal("doc_head.g3dj"))
   models("doc_body") = modelLoader.loadModel(Gdx.files.internal("doc_body.g3dj"))
@@ -177,13 +177,13 @@ class TestScene(iAmGood: Boolean) extends Scene {
   val playerHeadModel = new ModelInstance(models("doc_head"));
   val playerAttackModel = new ModelInstance(models("doc_body_attack"));
   val playerHeadAttackModel = new ModelInstance(models("doc_head_attack"));
-  val playerHandsAttackModel = new ModelInstance(models("doc_hands"));
+  // val playerHandsAttackModel = new ModelInstance(models("doc_hands"));
 
   val enemyModel = new ModelInstance(models("evil_body"));
   val enemyHeadModel = new ModelInstance(models("evil_head"));
   val enemyAttackModel = new ModelInstance(models("evil_body_attack"));
   val enemyHeadAttackModel = new ModelInstance(models("evil_head_attack"));
-  val enemyHandsAttackModel = new ModelInstance(models("doc_hands"));
+  // val enemyHandsAttackModel = new ModelInstance(models("doc_hands"));
 
   var charge = 0.0f
 

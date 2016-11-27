@@ -296,9 +296,6 @@ class Game(config: GameConfig) extends ApplicationAdapter with InputProcessor {
 	var skipCount = 0
 
 	override def render(): Unit = {
-		charge = scene.get.charge
-		gameOver = scene.get.gameOver
-		playerWon = scene.get.playerWon
 		Gdx.gl.glClearColor(0, 0, 0, 0)
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT)
 
@@ -317,6 +314,9 @@ class Game(config: GameConfig) extends ApplicationAdapter with InputProcessor {
 			}
 		}
 		if (isHost) {
+			charge = scene.get.charge
+			gameOver = scene.get.gameOver
+			playerWon = scene.get.playerWon
 			if (!gameOver) {
 				scene.get.update(DELTA, AllInputs(inputs, receivedInputs))
 				scene.get.updateVisual(DELTA, AllInputs(inputs, receivedInputs))

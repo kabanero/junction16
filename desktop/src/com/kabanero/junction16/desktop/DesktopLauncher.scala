@@ -15,6 +15,8 @@ object DesktopLauncher {
 			config.height = 1000
 		} else {
 			config.x = 800
+			config.width = 1440
+			config.height = 900
 		}
 		new LwjglApplication(new Game(gameConfig), config);
 	}
