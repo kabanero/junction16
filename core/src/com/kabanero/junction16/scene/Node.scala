@@ -37,6 +37,7 @@ case class Node() {
   var isDynamic = false
   var isAttacking = false
   var overrideRotation = false
+  var isPossessed = false
 
   def flatten: Vector[Node] = {
     Vector(this) ++ _children.map { child =>

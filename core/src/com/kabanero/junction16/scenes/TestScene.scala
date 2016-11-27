@@ -29,7 +29,7 @@ import com.badlogic.gdx.physics.box2d.BodyDef.BodyType
 import com.kabanero.junction16.level.TestLevel
 
 class TestScene(iAmGood: Boolean) extends Scene {
-  val PLAYER_SPEED = 200.0f
+  val PLAYER_SPEED = 110.0f
   val CAMERA_SPEED = 1 / 5.0f
   val UP = new Vector3(0, 1, 0)
   val RIGHT = new Vector3(-1, 0, 0)
@@ -103,6 +103,33 @@ class TestScene(iAmGood: Boolean) extends Scene {
   models("npc_doctor_dead") = modelLoader.loadModel(Gdx.files.internal("npc_doctor_dead.g3dj"))
   collisionSizes("npc_doctor_dead") = (0.1f,0.1f)
 
+  var unPressed = false
+
+  var possessedNode: Option[Node] = None
+
+  def unpossessScript(delta: Float, node: Node, inputs: AllInputs) {
+    if (possessedNode.isDefined) {
+      if (inputs.ownInputs.action) {
+        if (unPressed) {
+          println("UNPOSSESS")
+          possessedNode.get.children -= cameraNode
+          val pos = new Vector3(possessedNode.get.localPosition)
+          pos.add(possessedNode.get.forward)
+          // node.children.clear()
+          cameraNode.localPosition.set(new Vector3(0, 0, 0))
+          enemyHead.addChild(cameraNode)
+          possessedNode.get.isPossessed = false
+          possessedNode = None
+          enemyNode.physicsBody.get.setTransform(pos.x, pos.z, 0)
+          possessTimer += 2.0f
+          unPressed = false
+        }
+      } else {
+        unPressed = true
+      }
+    }
+  }
+
   def ownMovement(delta: Float, node: Node, inputs: AllInputs) {
     val rotationY = new Quaternion(UP, -inputs.ownInputs.mouseX * CAMERA_SPEED)
     val rotationX = new Quaternion(RIGHT, -inputs.ownInputs.mouseY * CAMERA_SPEED)
@@ -172,12 +199,64 @@ class TestScene(iAmGood: Boolean) extends Scene {
     }
   }
 
+  // var unPressed = false
+  //
+  // def unpossessScript(delta: Float, node: Node, inputs: AllInputs) {
+  //   if (inputs.ownInputs.action) {
+  //     if (unPressed) {
+  //       println("UNPOSSESS")
+  //       node.children -= cameraNode
+  //       enemyHead.addChild(cameraNode)
+  //       node.updateMethods(0) = (delta: Float, node: Node, inputs: AllInputs) => {}
+  //       unPressed = false
+  //     }
+  //   } else {
+  //     unPressed = true
+  //   }
+  // }
+
+  var possessTimer = 0.0f
+
   def enemyAction(delta: Float, node: Node, inputs: AllInputs) {
+    if (possessTimer > 0.0f) {
+      possessTimer -= delta
+    }
     if (!iAmGood) {
       val actionState = inputs.ownInputs.action
       node.isAttacking = actionState
-      if (actionState) {
+      if (actionState && possessedNode.isEmpty && possessTimer <= 0.0f) {
+        val nodes = rootNode.flatten
 
+        val probePos = new Vector3(node.localPosition)
+        probePos.add(node.forward)
+
+        var distance = 0.7f
+        var found: Option[Node] = None
+
+        nodes.foreach { otherNode =>
+          if (otherNode.name != node.name) {
+            val diff = new Vector3(otherNode.localPosition)
+            diff.sub(probePos)
+            val l = diff.len
+            if (l < distance) {
+              distance = l
+              found = Some(otherNode)
+            }
+          }
+        }
+
+        if (found.isDefined) {
+          node.children(0).children -= cameraNode
+          cameraNode.localPosition.set(new Vector3(0, 1, 0))
+          val foundNode = found.get
+          foundNode.addChild(cameraNode)
+          foundNode.isPossessed = true
+          possessedNode = Some(foundNode)
+          node.physicsBody.get.setTransform(10000, 0, 0)
+          // enemyNode.localPosition.set(new Vector3(10000, 0, 0))
+          // foundNode.updateMethods += ownMovement
+          // foundNode.updateMethods += unpossessScript
+        }
       }
     } else {
       val actionState = inputs.otherInputs.action
@@ -194,9 +273,6 @@ class TestScene(iAmGood: Boolean) extends Scene {
     if (!iAmGood) {
       val actionState = inputs.ownInputs.action
       node.isAttacking = actionState
-      if (actionState) {
-
-      }
     } else {
       val actionState = inputs.otherInputs.action
       node.isAttacking = actionState
@@ -351,6 +427,7 @@ class TestScene(iAmGood: Boolean) extends Scene {
     }
 
     node.updateMethods += enemyAction
+    node.updateMethods += unpossessScript
 
 		node
   }

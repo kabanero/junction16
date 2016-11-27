@@ -52,6 +52,40 @@ abstract class SubLevel(
     node
   }
 
+  def ownMovement(delta: Float, node: Node, inputs: AllInputs) {
+    if (node.isPossessed) {
+      val rotationY = new Quaternion(UP, -inputs.ownInputs.mouseX / 5.0f)
+      val body = node.physicsBody.get
+
+      node.localRotation.set(rotationY)
+
+      val moveDirection = new Vector3(0, 0, 0)
+
+      val forwardMove = node.forward
+      forwardMove.y = 0
+      forwardMove.nor()
+      val rightMove = node.right
+      rightMove.y = 0
+      rightMove.nor()
+      if (inputs.ownInputs.up) {
+        moveDirection.z += 1
+      }
+      if (inputs.ownInputs.down) {
+        moveDirection.z -= 1
+      }
+      if (inputs.ownInputs.left) {
+        moveDirection.x += 1
+      }
+      if (inputs.ownInputs.right) {
+        moveDirection.x -= 1
+      }
+
+      val velo = forwardMove.scl(moveDirection.z * delta * 20).add(rightMove.scl(moveDirection.x * delta * 20))
+
+      body.setLinearVelocity(velo.x, velo.z)
+    }
+  }
+
   def createObjectNode(id: String, x: Float, y: Float, rotation: Float): Node = {
     val node = Node(name + "|" + id + "|" + x + "|" + y)
 
@@ -85,6 +119,8 @@ abstract class SubLevel(
     node.physicsBody = Some(groundBody)
 
     node.isDynamic = true
+
+    node.updateMethods += ownMovement
 
     node
 
