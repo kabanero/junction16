@@ -234,7 +234,7 @@ class TestScene(iAmGood: Boolean) extends Scene {
         var found: Option[Node] = None
 
         nodes.foreach { otherNode =>
-          if (otherNode.name != node.name) {
+          if (otherNode.name != node.name && otherNode.isDynamic) {
             val diff = new Vector3(otherNode.localPosition)
             diff.sub(probePos)
             val l = diff.len
