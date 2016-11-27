@@ -164,6 +164,8 @@ abstract class SubLevel(
 
   }
 
+  // def wander(x1: Float, z: Float, )
+
   def genNPC(x: Float, z: Float): Node = {
     val node = Node("NPC|" + x + "|" + z)
     node.localPosition.set(new Vector3(x, 0, z))
