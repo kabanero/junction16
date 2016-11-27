@@ -30,7 +30,7 @@ class TestLevel(models: collection.mutable.Map[String, Model], world: World, col
   val floorNode = {
     val n = Node("floor")
     n.modelInstance = Some(new ModelInstance(floorModel))
-    n.localPosition = new Vector3(0, -0.1f, 0)
+    n.localPosition = new Vector3(0, -0.12f, 0)
     n
   }
 

@@ -29,6 +29,8 @@ import com.badlogic.gdx.Input.Buttons
 import com.badlogic.gdx.graphics.g3d.loader.G3dModelLoader
 import com.badlogic.gdx.utils.UBJsonReader
 import com.badlogic.gdx.Files.FileType
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 import java.io.BufferedReader
 import java.io.IOException
@@ -114,6 +116,22 @@ case class Position() {
 
 case class AllInputs(ownInputs: Inputs, otherInputs: Inputs);
 
+object GameState {
+	def apply(charge: Float, isOver: Boolean, playerWon: Boolean) = {
+		val g = new GameState()
+		g.charge = charge
+		g.isOver = isOver
+		g.playerWon = playerWon
+		g
+	}
+}
+
+class GameState() {
+	var charge = 0.0f
+	var isOver = false
+	var playerWon = false
+}
+
 class Game(config: GameConfig) extends ApplicationAdapter with InputProcessor {
 	val isHost = config.host
 	val isClient = !isHost
@@ -124,6 +142,8 @@ class Game(config: GameConfig) extends ApplicationAdapter with InputProcessor {
 	val models = Map[String, Model]()
 
 	lazy val batch = new ModelBatch()
+	lazy val spriteBatch = new SpriteBatch();
+  lazy val font = new BitmapFont();
 
 	lazy val img = new Texture("badlogic.jpg")
 	lazy val server = new Server(65536, 32768)
@@ -137,7 +157,7 @@ class Game(config: GameConfig) extends ApplicationAdapter with InputProcessor {
 	var hasReceivedInputs = false
 	var waitingForInputs = false
 
-	lazy val scene = new TestScene(!isHost)
+	var scene: Option[TestScene] = None
 
 	var newTransforms = Array[TransformChange]()
 
@@ -180,7 +200,12 @@ class Game(config: GameConfig) extends ApplicationAdapter with InputProcessor {
     return false
   }
 
+	var charge = 0.0f
+	var gameOver = false
+	var playerWon = false
+
 	override def create(): Unit = {
+		scene = Some(new TestScene(!isHost))
 		Gdx.input.setInputProcessor(this)
 		Gdx.input.setCursorCatched(true)
 		Gdx.input.setCursorPosition(0, 0)
@@ -192,6 +217,7 @@ class Game(config: GameConfig) extends ApplicationAdapter with InputProcessor {
     kryo.register(classOf[Array[TransformChange]])
     kryo.register(classOf[Vector3])
     kryo.register(classOf[Quaternion])
+    kryo.register(classOf[GameState])
 		if (config.host) {
 			server.start()
 		 	server.bind(54555, 54777)
@@ -202,6 +228,8 @@ class Game(config: GameConfig) extends ApplicationAdapter with InputProcessor {
 						case inputs: Inputs => {
 							receivedInputs = inputs
 							connection.sendTCP(newTransforms)
+							val g = GameState(charge, gameOver, playerWon)
+							connection.sendTCP(g)
 						}
 						case _ => {
 
@@ -216,6 +244,9 @@ class Game(config: GameConfig) extends ApplicationAdapter with InputProcessor {
 						 case response: Array[TransformChange] => {
 							 newTransforms = response
 							 waitingForInputs = false
+						 }
+						 case response: GameState => {
+							 charge = response.charge
 						 }
 						 case _ => { }
 					 }
@@ -259,24 +290,31 @@ class Game(config: GameConfig) extends ApplicationAdapter with InputProcessor {
 	var skipCount = 0
 
 	override def render(): Unit = {
+		charge = scene.get.charge
+		gameOver = scene.get.gameOver
+		playerWon = scene.get.playerWon
 		Gdx.gl.glClearColor(0, 0, 0, 0)
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT)
 
-		batch.begin(scene.cameraNode.cam.get)
-		render(scene.rootNode, batch)
+		batch.begin(scene.get.cameraNode.cam.get)
+		render(scene.get.rootNode, batch)
 		batch.end()
 
 		val inputs = poll
 		if (isClient) {
 			client.sendTCP(inputs)
 
-			scene.setPositions(newTransforms)
-			scene.updateVisual(DELTA, AllInputs(inputs, inputs))
+			if (!gameOver) {
+				scene.get.setPositions(newTransforms)
+				scene.get.updateVisual(DELTA, AllInputs(inputs, inputs))
+			}
 		}
 		if (isHost) {
-			scene.update(DELTA, AllInputs(inputs, receivedInputs))
-			scene.updateVisual(DELTA, AllInputs(inputs, receivedInputs))
-			val nodes = scene.rootNode.flatten
+			if (!gameOver) {
+				scene.get.update(DELTA, AllInputs(inputs, receivedInputs))
+				scene.get.updateVisual(DELTA, AllInputs(inputs, receivedInputs))
+			}
+			val nodes = scene.get.rootNode.flatten
 			val buff = ArrayBuffer[TransformChange]()
 			nodes.foreach { n =>
 				if (n.isDynamic) {
@@ -284,6 +322,26 @@ class Game(config: GameConfig) extends ApplicationAdapter with InputProcessor {
 				}
 			}
 			newTransforms = buff.toArray
+		}
+
+		spriteBatch.begin();
+    font.setColor(Color.WHITE);
+		if (isClient) {
+			val c = charge
+	    font.draw(spriteBatch, f"$c%1.0f", 25, 25);
+		}
+		if (gameOver) {
+			font.draw(spriteBatch, "GAME OVER", Gdx.graphics.getWidth() / 2 - 50, Gdx.graphics.getHeight() / 2 + 20);
+			if (playerWon) {
+				font.draw(spriteBatch, "DOCTORS WIN!", Gdx.graphics.getWidth() / 2 - 65, Gdx.graphics.getHeight() / 2 - 20);
+			} else {
+				font.draw(spriteBatch, "DEMON RESURRECTED...", Gdx.graphics.getWidth() / 2 - 40, Gdx.graphics.getHeight() / 2 - 20);
+			}
+			font.draw(spriteBatch, "BOTH PLAYERS PRESS ACTION TO START NEW GAME", Gdx.graphics.getWidth() / 2 - 200, 20);
+		}
+    spriteBatch.end();
+		if (gameOver && inputs.action && receivedInputs.action) {
+			scene = Some(new TestScene(!isHost))
 		}
 	}
 

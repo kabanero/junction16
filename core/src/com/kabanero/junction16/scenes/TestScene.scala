@@ -182,14 +182,17 @@ class TestScene(iAmGood: Boolean) extends Scene {
 
   var charge = 0.0f
 
+  var gameOver = false
+  var playerWon = false
+
   def playerAction(delta: Float, node: Node, inputs: AllInputs) {
     if (iAmGood) {
       val actionState = inputs.ownInputs.action
       node.isAttacking = actionState
     } else {
-      charge += delta
-      if (charge > 7.0f) {
-        charge = 7.0f;
+      charge += delta * 22.0f
+      if (charge > 100.0f) {
+        charge = 100.0f
       }
       val actionState = inputs.otherInputs.action
       node.isAttacking = actionState
@@ -215,10 +218,15 @@ class TestScene(iAmGood: Boolean) extends Scene {
           }
         }
         if (found.isDefined) {
+          if ((found.get.isPossessed || found.get.name == "enemy") && charge > 97.0f) {
+            println("GAME OVER")
+            gameOver = true
+            playerWon = true
+          }
           val f = new Vector2(node.forward.x, node.forward.z).nor()
           found.get.physicsBody.get.applyLinearImpulse(
-            f.x * charge * 7.0f,
-            f.y * charge * 7.0f,
+            f.x * charge / 2.0f,
+            f.y * charge / 2.0f,
             probePos.x,
             probePos.z,
             true)
@@ -269,6 +277,11 @@ class TestScene(iAmGood: Boolean) extends Scene {
         }
 
         if (found.isDefined) {
+          if (found.get.name == "player") {
+            println("GAME OVER")
+            gameOver = true
+            playerWon = false
+          }
           node.children(0).children -= cameraNode
           cameraNode.localPosition.set(new Vector3(0, 1, 0))
           val foundNode = found.get
