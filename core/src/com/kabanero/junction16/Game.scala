@@ -234,17 +234,22 @@ class Game(config: GameConfig) extends ApplicationAdapter with InputProcessor {
 
 	lazy val lights = {
 		val env = new Environment();
-		env.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.15f, 0.15f, 0.15f, 0.5f));
+		env.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.20f, 0.20f, 0.20f, 1f));
 	  // env.add(new DirectionalLight().set(0.8f, 0.8f, 0.8f, -1f, -0.8f, -0.2f));
 
 		// Offices and staff rooms
 	  env.add(new PointLight().set(1f, 1f, 0.9f, 4f, 1.5f, 4f, 5f));
-	  env.add(new PointLight().set(1f, 1f, 0.9f, 4f, 1.5f, 10.5f, 5f));
-	  env.add(new PointLight().set(1f, 1f, 0.9f, 4f, 1.5f, 17f, 5f));
-	  env.add(new PointLight().set(1f, 1f, 0.9f, 11f, 1.5f, 17f, 5f));
-	  env.add(new PointLight().set(1f, 1f, 0.9f, 16f, 0f, 15f, 5f));
+	  // env.add(new PointLight().set(1f, 1f, 0.9f, 4f, 1.5f, 10.5f, 5f));
+	  // env.add(new PointLight().set(1f, 1f, 0.9f, 4f, 1.5f, 17f, 5f));
+	  // env.add(new PointLight().set(1f, 1f, 0.9f, 11f, 1.5f, 17f, 5f));
+	  env.add(new PointLight().set(1f, 1f, 0.9f, 16f, 1.5f, 15f, 5f));
 
-		// Operating theater
+		// Operating theaters
+	  env.add(new PointLight().set(0.6f, 0.6f, 1f, 18f, 1.5f, 5f, 5f));
+	  env.add(new PointLight().set(0.6f, 0.6f, 1f, 30f, 1.5f, 5f, 5f));
+	  env.add(new PointLight().set(0.6f, 0.6f, 1f, 38f, 1.5f, 10f, 5f));
+
+
 		// env.add(new PointLight().set(0.1f, 0.1f, 0.51f, 20.0f, 4.5f, 4.5f, 3f));
 
 

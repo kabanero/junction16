@@ -420,30 +420,30 @@ class TestScene(iAmGood: Boolean) extends Scene {
   playerNode.addChild(playerHead)
   enemyNode.addChild(enemyHead)
 
-	val cubeNode = {
-		val node = Node("screen thingy")
-
-		val instance = new ModelInstance(models("ent_device_screens"));
-		node.modelInstance = Some(instance);
-
-		node.localPosition = new Vector3(0, 0, 8)
-
-    val groundBodyDef = new BodyDef();
-    groundBodyDef.position.set(new Vector2(node.localPosition.x, node.localPosition.z));
-    val groundBody = world.createBody(groundBodyDef)
-    val groundBox = new PolygonShape()
-    groundBox.setAsBox(1f, 1f)
-    groundBody.createFixture(groundBox, 0.0f)
-    groundBox.dispose()
-
-    node.physicsBody = Some(groundBody)
-
-		node
-	}
+	// val cubeNode = {
+	// 	val node = Node("screen thingy")
+  //
+	// 	val instance = new ModelInstance(models("ent_device_screens"));
+	// 	node.modelInstance = Some(instance);
+  //
+	// 	node.localPosition = new Vector3(0, 0, 8)
+  //
+  //   val groundBodyDef = new BodyDef();
+  //   groundBodyDef.position.set(new Vector2(node.localPosition.x, node.localPosition.z));
+  //   val groundBody = world.createBody(groundBodyDef)
+  //   val groundBox = new PolygonShape()
+  //   groundBox.setAsBox(1f, 1f)
+  //   groundBody.createFixture(groundBox, 0.0f)
+  //   groundBox.dispose()
+  //
+  //   node.physicsBody = Some(groundBody)
+  //
+	// 	node
+	// }
 
   rootNode.addChild(playerNode)
   rootNode.addChild(enemyNode)
-  rootNode.addChild(cubeNode)
+  // rootNode.addChild(cubeNode)
 
   val level = new TestLevel(models, world, collisionSizes)
   rootNode.addChild(level.levelRoot)
