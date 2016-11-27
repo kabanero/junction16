@@ -228,6 +228,10 @@ class Game(config: GameConfig) extends ApplicationAdapter with InputProcessor {
 						case inputs: Inputs => {
 							receivedInputs = inputs
 							connection.sendTCP(newTransforms)
+							// val g = GameState(charge, gameOver, playerWon)
+							// connection.sendTCP(g)
+						}
+						case request: GameState => {
 							val g = GameState(charge, gameOver, playerWon)
 							connection.sendTCP(g)
 						}
@@ -247,6 +251,8 @@ class Game(config: GameConfig) extends ApplicationAdapter with InputProcessor {
 						 }
 						 case response: GameState => {
 							 charge = response.charge
+							 gameOver = response.isOver
+							 playerWon = response.playerWon
 						 }
 						 case _ => { }
 					 }
@@ -303,6 +309,7 @@ class Game(config: GameConfig) extends ApplicationAdapter with InputProcessor {
 		val inputs = poll
 		if (isClient) {
 			client.sendTCP(inputs)
+			client.sendTCP(GameState(charge, gameOver, playerWon))
 
 			if (!gameOver) {
 				scene.get.setPositions(newTransforms)
@@ -326,10 +333,10 @@ class Game(config: GameConfig) extends ApplicationAdapter with InputProcessor {
 
 		spriteBatch.begin();
     font.setColor(Color.WHITE);
-		if (isClient) {
+		// if (isClient) {
 			val c = charge
 	    font.draw(spriteBatch, f"$c%1.0f", 25, 25);
-		}
+		// }
 		if (gameOver) {
 			font.draw(spriteBatch, "GAME OVER", Gdx.graphics.getWidth() / 2 - 50, Gdx.graphics.getHeight() / 2 + 20);
 			if (playerWon) {

@@ -10,8 +10,9 @@ object DesktopLauncher {
 		val config = new LwjglApplicationConfiguration();
 		if (gameConfig.host) {
 			config.x = 0
-			config.width = 900
-			config.height = 600
+			config.y = 0
+			config.width = 1700
+			config.height = 1000
 		} else {
 			config.x = 800
 		}
