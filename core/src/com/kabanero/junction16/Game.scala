@@ -22,6 +22,7 @@ import com.badlogic.gdx.graphics.g3d.Material
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute
 import com.badlogic.gdx.graphics.g3d.Environment
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight
+import com.badlogic.gdx.graphics.g3d.environment.PointLight
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.Input.Keys
 import com.badlogic.gdx.Input.Buttons
@@ -125,8 +126,8 @@ class Game(config: GameConfig) extends ApplicationAdapter with InputProcessor {
 	lazy val batch = new ModelBatch()
 
 	lazy val img = new Texture("badlogic.jpg")
-	lazy val server = new Server(32768, 16384)
-	lazy val client = new Client(32768, 16384)
+	lazy val server = new Server(65536, 32768)
+	lazy val client = new Client(65536, 32768)
 	lazy val kryo = if (config.host) server.getKryo() else client.getKryo()
 
 	var inputsToSend = Inputs()
@@ -233,8 +234,20 @@ class Game(config: GameConfig) extends ApplicationAdapter with InputProcessor {
 
 	lazy val lights = {
 		val env = new Environment();
-		env.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.4f, 0.4f, 0.4f, 1f));
-	  env.add(new DirectionalLight().set(0.8f, 0.8f, 0.8f, -1f, -0.8f, -0.2f));
+		env.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.15f, 0.15f, 0.15f, 0.5f));
+	  // env.add(new DirectionalLight().set(0.8f, 0.8f, 0.8f, -1f, -0.8f, -0.2f));
+
+		// Offices and staff rooms
+	  env.add(new PointLight().set(1f, 1f, 0.9f, 4f, 1.5f, 4f, 5f));
+	  env.add(new PointLight().set(1f, 1f, 0.9f, 4f, 1.5f, 10.5f, 5f));
+	  env.add(new PointLight().set(1f, 1f, 0.9f, 4f, 1.5f, 17f, 5f));
+	  env.add(new PointLight().set(1f, 1f, 0.9f, 11f, 1.5f, 17f, 5f));
+	  env.add(new PointLight().set(1f, 1f, 0.9f, 16f, 0f, 15f, 5f));
+
+		// Operating theater
+		// env.add(new PointLight().set(0.1f, 0.1f, 0.51f, 20.0f, 4.5f, 4.5f, 3f));
+
+
 		env
 	}
 

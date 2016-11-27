@@ -60,7 +60,7 @@ class Office(
   addObject("ent_table_coffee_machine", 7.9f, 5.9f, 180.0f)
 
   // Staff room 0, 7
-  addObject("ent_sofa", 1f, 9f, 90.0f)
+  addObject("ent_sofa", 1f, 9f, -90.0f)
   addObject("ent_coffee_table", 2f, 9f, 90.0f)
   addObject("ent_sofa", 5f, 13f, 180.0f)
   addObject("ent_coffee_table", 5f, 12f, 180.0f)
